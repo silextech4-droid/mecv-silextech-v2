@@ -1,0 +1,1918 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="theme-color" content="#0a0e1a"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="MECV v4.2"/>
+<title>MECV SilexTech Tontine V4.2</title>
+<link rel="manifest" id="pwa-manifest"/>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+:root{
+  --bg:#0a0e1a; --bg2:#0f1628; --bg3:#141c35;
+  --blue:#36a3ff; --blue2:#1a7bd4; --blue-glow:rgba(54,163,255,0.15);
+  --gold:#f0b429; --gold2:#c8962a;
+  --green:#22c55e; --green2:#16a34a;
+  --red:#ef4444; --red2:#dc2626;
+  --white:#ffffff; --gray:#94a3b8; --gray2:#475569;
+  --border:rgba(54,163,255,0.2);
+  --radius:12px; --radius-sm:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--bg);color:var(--white);font-family:'Inter',sans-serif;font-size:14px;}
+
+/* ── SCROLLABLE PAGES ── */
+.screen{display:none;height:100vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.screen.active{display:block;}
+
+/* ── LOGIN ── */
+#screen-login{display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 0%,#0d2040 0%,var(--bg) 70%);}
+.login-box{width:100%;max-width:380px;padding:24px;}
+.login-logo{text-align:center;margin-bottom:28px;}
+.login-logo img{width:80px;height:80px;border-radius:16px;margin-bottom:10px;}
+.login-logo h1{font-family:'Space Grotesk',sans-serif;font-size:22px;color:var(--blue);}
+.login-logo p{font-size:12px;color:var(--gray);}
+.login-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;}
+.login-card h2{font-size:16px;margin-bottom:16px;color:var(--blue);}
+.pin-display{display:flex;justify-content:center;gap:10px;margin:16px 0;}
+.pin-dot{width:14px;height:14px;border-radius:50%;background:var(--bg3);border:2px solid var(--blue2);transition:background 0.2s;}
+.pin-dot.filled{background:var(--blue);}
+.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;}
+.pin-btn{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;font-size:20px;font-weight:600;color:var(--white);cursor:pointer;text-align:center;transition:all 0.15s;font-family:'Space Grotesk',sans-serif;}
+.pin-btn:active{background:var(--blue);transform:scale(0.95);}
+.pin-btn.del{font-size:16px;}
+.pin-btn.zero{grid-column:2;}
+.role-select{width:100%;padding:11px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--white);font-size:14px;margin-bottom:12px;-webkit-appearance:none;}
+
+/* ── HEADER ── */
+.app-header{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 16px;position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:10px;height:52px;}
+.app-logo{width:32px;height:32px;border-radius:8px;flex-shrink:0;}
+.app-header-title{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;color:var(--blue);}
+.app-header-sub{font-size:11px;color:var(--gray);}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.role-badge{background:var(--blue-glow);border:1px solid var(--border);padding:3px 10px;border-radius:20px;font-size:11px;color:var(--blue);}
+.logout-btn{background:none;border:none;color:var(--gray);font-size:18px;cursor:pointer;padding:4px;}
+
+/* ── NAV ── */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-top:1px solid var(--border);display:flex;z-index:50;padding-bottom:env(safe-area-inset-bottom);}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 4px;cursor:pointer;gap:3px;border:none;background:none;color:var(--gray);transition:all 0.2s;}
+.nav-item.active{color:var(--blue);}
+.nav-item span:first-child{font-size:18px;}
+.nav-item span:last-child{font-size:9px;font-weight:500;}
+.nav-indicator{width:4px;height:4px;border-radius:50%;background:var(--blue);margin:0 auto;opacity:0;}
+.nav-item.active .nav-indicator{opacity:1;}
+
+/* ── PAGE CONTENT ── */
+.page-body{padding:12px 12px 80px;}
+.page-header{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;margin-bottom:14px;color:var(--white);}
+
+/* ── CARDS ── */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px;}
+.card-title{font-size:11px;font-weight:600;color:var(--gray);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+
+/* ── KPI ── */
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.kpi{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:12px 10px;}
+.kpi-label{font-size:10px;color:var(--gray);margin-bottom:4px;}
+.kpi-val{font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700;}
+.kpi-val.blue{color:var(--blue);}
+.kpi-val.gold{color:var(--gold);}
+.kpi-val.green{color:var(--green);}
+.kpi-val.red{color:var(--red);}
+
+/* ── HERO BALANCE ── */
+.hero-balance{background:linear-gradient(135deg,#0d2040 0%,#0a1628 50%,#0d1a36 100%);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:10px;position:relative;overflow:hidden;}
+.hero-balance::before{content:'';position:absolute;top:-40px;right:-40px;width:160px;height:160px;background:radial-gradient(circle,rgba(54,163,255,0.12) 0%,transparent 70%);}
+.hero-label{font-size:11px;color:var(--gray);margin-bottom:4px;}
+.hero-amount{font-family:'Space Grotesk',sans-serif;font-size:30px;font-weight:700;color:var(--blue);}
+.hero-sub{font-size:11px;color:var(--gray);margin-top:4px;}
+.progress-bar{height:4px;background:rgba(255,255,255,0.08);border-radius:2px;margin-top:10px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--gold));border-radius:2px;transition:width 0.6s;}
+
+/* ── FORMS ── */
+.form-group{margin-bottom:12px;}
+.form-label{font-size:11px;font-weight:600;color:var(--gray);margin-bottom:5px;display:block;text-transform:uppercase;letter-spacing:0.04em;}
+.form-input,.form-select{width:100%;padding:11px 13px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--white);font-family:'Inter',sans-serif;font-size:14px;-webkit-appearance:none;}
+.form-input:focus,.form-select:focus{outline:none;border-color:var(--blue);background:#0d1a30;}
+.form-input::placeholder{color:var(--gray2);}
+
+/* ── BUTTONS ── */
+.btn{width:100%;padding:12px;border:none;border-radius:var(--radius-sm);font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;}
+.btn-blue{background:var(--blue);color:var(--bg);}
+.btn-blue:active{background:var(--blue2);}
+.btn-green{background:var(--green);color:var(--bg);}
+.btn-gold{background:var(--gold);color:var(--bg);}
+.btn-red{background:var(--red);color:var(--white);}
+.btn-ghost{background:var(--bg3);border:1px solid var(--border);color:var(--white);}
+.btn-sm{display:inline-block;width:auto;padding:5px 11px;font-size:11px;}
+.btn-row{display:flex;gap:8px;}
+.btn-row .btn{flex:1;}
+
+/* ── MEMBER ROW ── */
+.member-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);}
+.member-item:last-child{border-bottom:none;}
+.avatar{width:38px;height:38px;border-radius:50%;background:var(--blue-glow);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:var(--blue);flex-shrink:0;}
+.member-info{flex:1;min-width:0;}
+.member-name{font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.member-meta{font-size:11px;color:var(--gray);margin-top:1px;}
+.badge{display:inline-block;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:600;}
+.badge-blue{background:var(--blue-glow);color:var(--blue);border:1px solid var(--border);}
+.badge-green{background:rgba(34,197,94,0.12);color:var(--green);}
+.badge-red{background:rgba(239,68,68,0.12);color:var(--red);}
+.badge-gold{background:rgba(240,180,41,0.12);color:var(--gold);}
+
+/* ── TABLE ── */
+.tbl-wrap{overflow-x:auto;border-radius:var(--radius-sm);}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th{background:var(--bg3);color:var(--blue);padding:9px 10px;font-size:10px;font-weight:600;text-transform:uppercase;white-space:nowrap;letter-spacing:0.05em;}
+td{padding:9px 10px;border-bottom:1px solid rgba(255,255,255,0.04);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+
+/* ── PRET CARD ── */
+.pret-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:8px;}
+.pret-header{display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;}
+.pret-name{font-weight:600;font-size:13px;}
+.pret-type{font-size:10px;color:var(--gray);}
+.pret-amounts{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;}
+.amt-box{background:rgba(255,255,255,0.04);border-radius:6px;padding:8px;text-align:center;}
+.amt-label{font-size:9px;color:var(--gray);margin-bottom:2px;}
+.amt-val{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:13px;}
+
+/* ── RECAP BOX ── */
+.recap-box{background:rgba(240,180,41,0.08);border:1px solid rgba(240,180,41,0.25);border-radius:var(--radius-sm);padding:12px;margin-bottom:12px;}
+.recap-row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;}
+.recap-row:last-child{margin-bottom:0;font-size:14px;font-weight:700;}
+
+/* ── CHART ── */
+.chart-bar-wrap{margin-top:8px;}
+.chart-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.chart-label{font-size:11px;color:var(--gray);width:80px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.chart-track{flex:1;height:8px;background:var(--bg3);border-radius:4px;overflow:hidden;}
+.chart-fill{height:100%;border-radius:4px;transition:width 0.6s;}
+.chart-val{font-size:11px;color:var(--white);font-weight:600;width:60px;text-align:right;flex-shrink:0;}
+
+/* ── SIGNATURE PAD ── */
+.sig-wrap{border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;margin-bottom:10px;}
+#sig-canvas{width:100%;height:120px;background:#0a1020;display:block;touch-action:none;}
+.sig-controls{display:flex;gap:6px;padding:6px;background:var(--bg3);}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--bg2);border:1px solid var(--border);color:var(--white);padding:10px 20px;border-radius:24px;font-size:12px;font-weight:500;box-shadow:0 4px 20px rgba(0,0,0,0.4);opacity:0;pointer-events:none;transition:all 0.3s;z-index:999;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ── MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;align-items:flex-end;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--bg2);border:1px solid var(--border);border-top-left-radius:20px;border-top-right-radius:20px;padding:20px;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;}
+.modal-handle{width:40px;height:4px;background:var(--bg3);border-radius:2px;margin:0 auto 16px;}
+.modal-title{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;margin-bottom:14px;color:var(--blue);}
+
+/* ── EMPTY ── */
+.empty{text-align:center;padding:40px 20px;color:var(--gray);}
+.empty-icon{font-size:36px;margin-bottom:8px;}
+
+/* ── PWA BANNER ── */
+.pwa-banner{background:var(--blue-glow);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.pwa-banner-text{flex:1;font-size:12px;}
+.pwa-banner-btn{background:var(--blue);color:var(--bg);border:none;padding:6px 12px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;}
+
+/* ── SECTION DIVIDER ── */
+.section-sep{font-size:11px;font-weight:600;color:var(--gray);text-transform:uppercase;letter-spacing:0.06em;margin:14px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+
+input[type=number]{-moz-appearance:textfield;}
+input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
+
+/* ── AGRICULTURE ── */
+.agri-header{background:linear-gradient(135deg,var(--green) 0%,#1B8A4A 100%);border-radius:var(--radius);padding:16px;color:var(--white);margin-bottom:12px;}
+.green-light{background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);}
+.gold-light{background:rgba(240,180,41,0.08);border:1px solid rgba(240,180,41,0.2);}
+</style>
+</head>
+<body>
+
+<!-- ══ LOGIN ══ -->
+<div id="screen-login" class="screen active">
+<div class="login-box">
+  <div class="login-logo">
+    <div id="header-logo-placeholder" style="width:80px;height:80px;border-radius:16px;background:#0d2040;border:2px solid #36a3ff;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:700;color:#36a3ff;margin:0 auto 10px;">S</div>
+    <h1>SilexTech Tontine</h1>
+    <p>MECV V4.2 — Connexion sécurisée</p>
+  </div>
+  <div class="login-card">
+    <h2>🔐 Accès sécurisé</h2>
+    <div class="form-group">
+      <label class="form-label">Code de groupe Firebase</label>
+      <input type="text" class="form-input" id="login-groupcode" placeholder="ex: MECV2025" oninput="window.groupCode=this.value.trim().toUpperCase();try{localStorage.setItem('mecv_lastgroup',window.groupCode);}catch(e){}" style="text-transform:uppercase;letter-spacing:0.08em;font-family:'Space Grotesk',sans-serif;font-weight:600"/>
+      <div style="font-size:10px;color:var(--gray);margin-top:4px">🔗 Identifiant commun à tous les membres du groupe</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Votre rôle</label>
+      <select class="form-select" id="login-role" onchange="updateLoginUI()">
+        <option value="president">👑 Président MECV</option>
+        <option value="tresorier">💼 Trésorier</option>
+        <option value="secretaire">📋 Secrétaire</option>
+        <option value="membre">👤 Membre (spectateur)</option>
+      </select>
+    </div>
+
+    <div class="form-group" id="login-membre-grp" style="display:none">
+      <label class="form-label">Votre nom</label>
+      <select class="form-select" id="login-membre-sel"></select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Code PIN</label>
+      <div class="pin-display" id="pin-display">
+        <div class="pin-dot" id="d0"></div>
+        <div class="pin-dot" id="d1"></div>
+        <div class="pin-dot" id="d2"></div>
+        <div class="pin-dot" id="d3"></div>
+        <div class="pin-dot" id="d4"></div>
+        <div class="pin-dot" id="d5"></div>
+      </div>
+    </div>
+    <div class="pin-pad" id="pin-pad">
+      <button class="pin-btn" data-pin="1">1</button>
+      <button class="pin-btn" data-pin="2">2</button>
+      <button class="pin-btn" data-pin="3">3</button>
+      <button class="pin-btn" data-pin="4">4</button>
+      <button class="pin-btn" data-pin="5">5</button>
+      <button class="pin-btn" data-pin="6">6</button>
+      <button class="pin-btn" data-pin="7">7</button>
+      <button class="pin-btn" data-pin="8">8</button>
+      <button class="pin-btn" data-pin="9">9</button>
+      <button class="pin-btn zero" data-pin="0">0</button>
+      <button class="pin-btn del" id="pin-del-btn">⌫</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══ APP ══ -->
+<div id="screen-app" class="screen">
+
+<!-- Header -->
+<div class="app-header">
+  <div id="app-logo" style="width:32px;height:32px;border-radius:8px;background:#0d2040;border:1px solid #36a3ff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#36a3ff;flex-shrink:0;">S</div>
+  <div>
+    <div class="app-header-title">SilexTech Tontine</div>
+    <div class="app-header-sub" id="header-cycle">Cycle — / —</div>
+  </div>
+  <div class="header-right">
+    <span class="role-badge" id="sync-status" title="Statut de synchronisation" style="cursor:pointer" onclick="forceSyncNow()">☁️</span>
+    <span class="role-badge" id="role-badge">—</span>
+    <button class="logout-btn" onclick="deconnexion()">⏻</button>
+  </div>
+</div>
+
+<!-- Pages -->
+<div id="page-bord" class="page-body" style="display:block">
+  <div id="pwa-banner-wrap"></div>
+  <div class="hero-balance">
+    <div class="hero-label">Capital total encaissé</div>
+    <div class="hero-amount" id="kpi-capital">0 FCFA</div>
+    <div class="hero-sub" id="kpi-sem">Semaine 0 / 52</div>
+    <div class="progress-bar"><div class="progress-fill" id="prog" style="width:0%"></div></div>
+  </div>
+  <div class="kpi-grid">
+    <div class="kpi"><div class="kpi-label">Prêts actifs</div><div class="kpi-val blue" id="kpi-pa">0</div></div>
+    <div class="kpi"><div class="kpi-label">Intérêts collectés</div><div class="kpi-val gold" id="kpi-int">0 F</div></div>
+    <div class="kpi"><div class="kpi-label">Fonds agricole</div><div class="kpi-val green" id="kpi-agr">0 F</div></div>
+    <div class="kpi"><div class="kpi-label">En retard</div><div class="kpi-val red" id="kpi-ret">0</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Statut membres</div>
+    <div id="bord-liste"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Répartition financière</div>
+    <div class="chart-bar-wrap" id="chart-finance"></div>
+  </div>
+</div>
+
+<div id="page-cot" class="page-body" style="display:none">
+  <div class="page-header">💰 Cotisations</div>
+  <div class="card">
+    <div class="card-title">Nouvelle cotisation</div>
+    <div class="form-group"><label class="form-label">Membre</label><select class="form-select" id="cot-m"></select></div>
+    <div class="form-group"><label class="form-label">Semaine N°</label><input type="number" class="form-input" id="cot-s" min="1" max="52" placeholder="1 à 52"/></div>
+    <div class="form-group"><label class="form-label">Montant (FCFA)</label><input type="number" class="form-input" id="cot-amt" value="2000"/></div>
+    <div class="form-group"><label class="form-label">Statut</label>
+      <select class="form-select" id="cot-stat">
+        <option value="Payé">✅ Payé</option>
+        <option value="Retard">⚠️ Retard</option>
+        <option value="Non payé">❌ Non payé</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">Mode de paiement</label>
+      <select class="form-select" id="cot-mode">
+        <option value="Espèces">💵 Espèces</option>
+        <option value="MTN Mobile Money">📱 MTN Mobile Money</option>
+        <option value="Moov Money">📱 Moov Money</option>
+      </select>
+    </div>
+    <button class="btn btn-blue" onclick="enrCotisation()">Enregistrer</button>
+  </div>
+  <div class="section-sep">Historique</div>
+  <div class="card">
+    <div class="form-group"><label class="form-label">Filtrer</label>
+      <select class="form-select" id="cot-filtre" onchange="affCotisations()">
+        <option value="">Tous les membres</option>
+      </select>
+    </div>
+    <div id="cot-liste"></div>
+  </div>
+</div>
+
+<div id="page-pret" class="page-body" style="display:none">
+  <div class="page-header">📋 Prêts</div>
+  <div class="card">
+    <div class="card-title">Nouveau prêt</div>
+    <div class="form-group"><label class="form-label">Type</label>
+      <select class="form-select" id="pt-type" onchange="updatePretUI()">
+        <option value="Membre">Membre — 10%</option>
+        <option value="Externe">Externe — 15%</option>
+      </select>
+    </div>
+    <div id="pt-m-grp" class="form-group"><label class="form-label">Membre emprunteur</label><select class="form-select" id="pt-m"></select></div>
+    <div id="pt-e-grp" class="form-group" style="display:none"><label class="form-label">Nom de l'externe</label><input type="text" class="form-input" id="pt-enom" placeholder="Nom complet"/></div>
+    <div id="pt-c-grp" class="form-group" style="display:none"><label class="form-label">Membre caution</label><select class="form-select" id="pt-caution"></select></div>
+    <div class="form-group"><label class="form-label">Montant (FCFA)</label><input type="number" class="form-input" id="pt-amt" placeholder="0" oninput="calcPretRecap()"/></div>
+    <div class="form-group"><label class="form-label">Date d'octroi</label><input type="date" class="form-input" id="pt-date" oninput="calcPretRecap()"/></div>
+    <div class="recap-box" id="pt-recap">
+      <div class="recap-row"><span>Taux</span><span id="rcp-taux">10%</span></div>
+      <div class="recap-row"><span>Intérêts</span><span id="rcp-int">0 FCFA</span></div>
+      <div class="recap-row"><span>Date limite</span><span id="rcp-lim">—</span></div>
+      <div class="recap-row"><span>Total à rembourser</span><span id="rcp-tot" style="color:var(--gold)">0 FCFA</span></div>
+    </div>
+    <button class="btn btn-blue" onclick="enrPret()">Accorder le prêt</button>
+  </div>
+  <div class="section-sep">Prêts en cours</div>
+  <div id="pret-liste"></div>
+  <div class="section-sep">Historique remboursements</div>
+  <div id="remb-liste"></div>
+</div>
+
+<div id="page-fin" class="page-body" style="display:none">
+  <div class="page-header">📊 Tableau financier</div>
+  <div class="card">
+    <div class="card-title">Récapitulatif du cycle</div>
+    <div id="fin-recap"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Distribution prévisionnelle</div>
+    <div id="fin-distrib"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Performance membres</div>
+    <div class="chart-bar-wrap" id="chart-perf"></div>
+  </div>
+  <button class="btn btn-gold" style="margin-bottom:10px" onclick="genererPDF()">📄 Générer PDF clôture</button>
+  <button class="btn btn-ghost" onclick="exporterDonnees()">💾 Exporter JSON</button>
+</div>
+
+<div id="page-membres" class="page-body" style="display:none">
+  <div class="page-header">👥 Membres</div>
+  <div class="card">
+    <div class="card-title">Ajouter un membre</div>
+    <div class="form-group"><label class="form-label">Nom complet</label><input type="text" class="form-input" id="mb-nom" placeholder="Prénom Nom"/></div>
+    <div class="form-group"><label class="form-label">Téléphone</label><input type="text" class="form-input" id="mb-tel" placeholder="+229 97 00 00 00"/></div>
+    <div class="form-group"><label class="form-label">Sexe</label>
+      <select class="form-select" id="mb-sexe">
+        <option value="Homme">Homme</option>
+        <option value="Femme">Femme</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">Adresse</label><input type="text" class="form-input" id="mb-adr" placeholder="Village / Quartier"/></div>
+    <button class="btn btn-blue" onclick="ajouterMembre()">Ajouter</button>
+  </div>
+  <div class="section-sep">Liste des membres</div>
+  <div class="card">
+    <input class="form-input" id="mb-search" placeholder="🔍 Rechercher..." oninput="affMembres()" style="margin-bottom:10px"/>
+    <div id="mb-liste"></div>
+  </div>
+</div>
+
+<div id="page-config" class="page-body" style="display:none">
+  <div class="page-header">⚙️ Paramètres</div>
+  <div class="card president-only">
+    <div class="card-title">Cycle & paramètres financiers</div>
+    <div class="form-group"><label class="form-label">Nom du groupe</label><input type="text" class="form-input" id="cfg-nom" placeholder="SilexTech Tontine"/></div>
+    <div class="form-group"><label class="form-label">Année début</label><input type="number" class="form-input" id="cfg-ad" placeholder="2025"/></div>
+    <div class="form-group"><label class="form-label">Année fin</label><input type="number" class="form-input" id="cfg-af" placeholder="2026"/></div>
+    <div class="form-group"><label class="form-label">Cotisation hebdomadaire (FCFA)</label><input type="number" class="form-input" id="cfg-cot" placeholder="2000"/></div>
+    <div class="form-group"><label class="form-label">Taux membres (%)</label><input type="number" class="form-input" id="cfg-tm" placeholder="10"/></div>
+    <div class="form-group"><label class="form-label">Taux externes (%)</label><input type="number" class="form-input" id="cfg-te" placeholder="15"/></div>
+    <div class="form-group"><label class="form-label">% fonds agricole</label><input type="number" class="form-input" id="cfg-agri" placeholder="10"/></div>
+    <button class="btn btn-blue" onclick="saveCfg()">Enregistrer</button>
+  </div>
+  <div class="card president-only">
+    <div class="card-title">Signature du Président MECV</div>
+    <p style="font-size:12px;color:var(--gray);margin-bottom:10px">Dessinez votre signature ci-dessous. Elle sera apposée sur les reçus PDF.</p>
+    <div class="sig-wrap">
+      <canvas id="sig-canvas" width="400" height="120"></canvas>
+    </div>
+    <div class="sig-controls">
+      <button class="btn btn-ghost btn-sm" onclick="clearSig()">🗑 Effacer</button>
+      <button class="btn btn-blue btn-sm" onclick="saveSig()">💾 Sauvegarder signature</button>
+    </div>
+  </div>
+  <div class="card president-only">
+    <div class="card-title">Installation PWA</div>
+    <div id="pwa-install-info"></div>
+    <div style="font-size:12px;color:var(--gray);margin-top:8px">
+      <p>✅ <strong>Hors ligne :</strong> l'app fonctionne sans internet grâce au Service Worker</p>
+      <p style="margin-top:4px">🔄 <strong>En ligne :</strong> les données sont synchronisées automatiquement</p>
+    </div>
+  </div>
+  <div class="card president-only">
+    <div class="card-title" style="color:var(--green)">📱 Demandes de paiement mobile</div>
+    <div id="demandes-liste"><div class="empty"><div class="empty-icon">📭</div><div>Aucune demande</div></div></div>
+  </div>
+  <div class="card president-only">
+    <div class="card-title" style="color:var(--red)">Zone de danger</div>
+    <button class="btn btn-red" onclick="reinitCycle()">🗑 Réinitialiser le cycle</button>
+  </div>
+</div>
+
+<!-- ══ PAGE AGRICULTURE ══ -->
+<div id="page-agri" class="page-body" style="display:none">
+  <div class="agri-header">
+    <div style="font-size:32px;margin-bottom:6px">🌾</div>
+    <div style="font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700">Campagne agricole collective</div>
+    <div style="font-size:12px;opacity:0.75">Arachides &amp; Soja — Saison pluvieuse</div>
+  </div>
+  <div class="card">
+    <div class="card-title">Paramètres</div>
+    <div class="form-group"><label class="form-label">% prélevé sur le fonds principal</label><input type="number" class="form-input" id="agri-pct" value="10" min="1" max="50" oninput="calcAgri()"/></div>
+    <div class="form-group"><label class="form-label">Superficie (hectares)</label><input type="number" class="form-input" id="agri-superficie" value="2" step="0.5" oninput="calcAgri()"/></div>
+    <div class="form-group"><label class="form-label">Saison</label><input type="text" class="form-input" id="agri-saison" value="Juin - Octobre 2025"/></div>
+  </div>
+  <div class="card green-light">
+    <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+      <span style="font-size:13px;color:var(--green);font-weight:600">Fonds alloué</span>
+      <strong id="agri-fonds-calcule" style="color:var(--green);font-family:'Space Grotesk',sans-serif;font-size:16px">0 FCFA</strong>
+    </div>
+    <div style="font-size:12px;color:var(--green)">Calculé sur le capital total encaissé</div>
+  </div>
+  <div class="section-sep">Charges de campagne</div>
+  <div class="card">
+    <div id="charges-list"></div>
+    <hr style="border:none;border-top:1px solid rgba(255,255,255,0.06);margin:10px 0"/>
+    <div class="form-group"><label class="form-label">Poste de dépense</label><input type="text" class="form-input" id="charge-label" placeholder="ex: Semences arachides"/></div>
+    <div class="form-group"><label class="form-label">Montant (FCFA)</label><input type="number" class="form-input" id="charge-montant" placeholder="0"/></div>
+    <button class="btn btn-green" onclick="ajouterCharge()">Ajouter une charge</button>
+  </div>
+  <div class="section-sep">Recettes de vente</div>
+  <div class="card">
+    <div class="form-group"><label class="form-label">Arachides — Quantité (kg)</label><input type="number" class="form-input" id="vente-arachide-kg" placeholder="0" oninput="calcAgri()"/></div>
+    <div class="form-group"><label class="form-label">Arachides — Prix au kg (FCFA)</label><input type="number" class="form-input" id="vente-arachide-prix" placeholder="0" oninput="calcAgri()"/></div>
+    <div class="form-group"><label class="form-label">Soja — Quantité (kg)</label><input type="number" class="form-input" id="vente-soja-kg" placeholder="0" oninput="calcAgri()"/></div>
+    <div class="form-group"><label class="form-label">Soja — Prix au kg (FCFA)</label><input type="number" class="form-input" id="vente-soja-prix" placeholder="0" oninput="calcAgri()"/></div>
+    <div class="card gold-light" style="padding:14px;margin-top:10px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px"><span>Total recettes</span><strong id="agri-recettes">0 FCFA</strong></div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px"><span>Total charges</span><strong id="agri-charges-total">0 FCFA</strong></div>
+      <hr style="border:none;border-top:1px solid rgba(255,255,255,0.06);margin:8px 0"/>
+      <div style="display:flex;justify-content:space-between;font-size:16px;font-weight:700"><span>Bénéfice net</span><span id="agri-benefice" style="color:var(--green)">0 FCFA</span></div>
+    </div>
+    <button class="btn btn-green" style="margin-top:8px" onclick="sauvegarderAgri()">Enregistrer les données agricoles</button>
+  </div>
+</div>
+
+<!-- Bottom Nav -->
+<div class="bottom-nav">
+  <button class="nav-item active" onclick="showPage('bord',this)"><span>🏠</span><span>Accueil</span><div class="nav-indicator"></div></button>
+  <button class="nav-item" onclick="showPage('cot',this)"><span>💰</span><span>Cotis.</span><div class="nav-indicator"></div></button>
+  <button class="nav-item" onclick="showPage('pret',this)"><span>📋</span><span>Prêts</span><div class="nav-indicator"></div></button>
+  <button class="nav-item" onclick="showPage('fin',this)"><span>📊</span><span>Finance</span><div class="nav-indicator"></div></button>
+  <button class="nav-item" onclick="showPage('membres',this)"><span>👥</span><span>Membres</span><div class="nav-indicator"></div></button>
+  <button class="nav-item" onclick="showPage('agri',this)"><span>🌾</span><span>Agri</span><div class="nav-indicator"></div></button>
+  <button class="nav-item" onclick="showPage('config',this)"><span>⚙️</span><span>Config</span><div class="nav-indicator"></div></button>
+</div>
+
+</div><!-- end screen-app -->
+
+<!-- ══ MODALS ══ -->
+<div class="modal-overlay" id="modal-edit-m">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">✏️ Modifier membre</div>
+    <input type="hidden" id="edit-m-id"/>
+    <div class="form-group"><label class="form-label">Nom</label><input type="text" class="form-input" id="edit-m-nom"/></div>
+    <div class="form-group"><label class="form-label">Téléphone</label><input type="text" class="form-input" id="edit-m-tel"/></div>
+    <div class="form-group"><label class="form-label">Adresse</label><input type="text" class="form-input" id="edit-m-adr"/></div>
+    <div class="form-group"><label class="form-label">PIN spectateur (6 chiffres)</label><input type="password" class="form-input" id="edit-m-pin" placeholder="Laisser vide = inchangé" maxlength="6" inputmode="numeric"/></div>
+    <div class="btn-row">
+      <button class="btn btn-blue" onclick="saveEditMembre()">Enregistrer</button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-edit-m')">Annuler</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-edit-c">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">✏️ Modifier cotisation</div>
+    <input type="hidden" id="edit-c-id"/>
+    <div class="form-group"><label class="form-label">Montant</label><input type="number" class="form-input" id="edit-c-amt"/></div>
+    <div class="form-group"><label class="form-label">Statut</label>
+      <select class="form-select" id="edit-c-stat">
+        <option value="Payé">✅ Payé</option>
+        <option value="Retard">⚠️ Retard</option>
+        <option value="Non payé">❌ Non payé</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">Mode</label>
+      <select class="form-select" id="edit-c-mode">
+        <option value="Espèces">💵 Espèces</option>
+        <option value="MTN Mobile Money">📱 MTN Mobile Money</option>
+        <option value="Moov Money">📱 Moov Money</option>
+      </select>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-blue" onclick="saveEditCot()">Enregistrer</button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-edit-c')">Annuler</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-edit-p">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">✏️ Modifier prêt</div>
+    <input type="hidden" id="edit-p-id"/>
+    <div class="form-group"><label class="form-label">Montant</label><input type="number" class="form-input" id="edit-p-amt" oninput="calcEditPret()"/></div>
+    <div class="form-group"><label class="form-label">Date</label><input type="date" class="form-input" id="edit-p-date"/></div>
+    <div class="form-group"><label class="form-label">Statut</label>
+      <select class="form-select" id="edit-p-stat">
+        <option value="En cours">En cours</option>
+        <option value="Remboursé">Remboursé</option>
+        <option value="En retard">En retard</option>
+      </select>
+    </div>
+    <div style="font-size:12px;color:var(--gold);margin-bottom:12px">Intérêts : <span id="edit-p-int">0 FCFA</span> — Total : <span id="edit-p-tot">0 FCFA</span></div>
+    <div class="btn-row">
+      <button class="btn btn-blue" onclick="saveEditPret()">Enregistrer</button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-edit-p')">Annuler</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-remb">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">💳 Enregistrer un remboursement</div>
+    <input type="hidden" id="remb-pret-id"/>
+    <div id="remb-info" style="font-size:12px;color:var(--gray);margin-bottom:12px"></div>
+    <div class="form-group"><label class="form-label">Montant versé (FCFA)</label><input type="number" class="form-input" id="remb-amt" placeholder="0"/></div>
+    <div class="form-group"><label class="form-label">Date</label><input type="date" class="form-input" id="remb-date"/></div>
+    <div class="form-group"><label class="form-label">Mode</label>
+      <select class="form-select" id="remb-mode">
+        <option value="Espèces">💵 Espèces</option>
+        <option value="MTN Mobile Money">📱 MTN Mobile Money</option>
+        <option value="Moov Money">📱 Moov Money</option>
+      </select>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-green" onclick="saveRemb()">Enregistrer versement</button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-remb')">Annuler</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-mobile-pay">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">📱 Paiement Mobile Money</div>
+    <div id="mobile-pay-info" style="font-size:13px;color:var(--gray);margin-bottom:14px"></div>
+    <div class="form-group"><label class="form-label">Réseau</label>
+      <select class="form-select" id="mpay-mode">
+        <option value="MTN Mobile Money">📱 MTN Mobile Money</option>
+        <option value="Moov Money">📱 Moov Money</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">Numéro de transaction</label>
+      <input type="text" class="form-input" id="mpay-ref" placeholder="Ex: TXN123456789"/>
+    </div>
+    <div style="background:var(--bg3);border-radius:var(--radius-sm);padding:12px;margin-bottom:12px;font-size:12px;color:var(--gray)">
+      ⚠️ La demande sera transmise au Trésorier pour validation. Votre paiement sera enregistré une fois confirmé.
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-green" onclick="envoyerDemandePaiement()">📤 Envoyer la demande</button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-mobile-pay')">Annuler</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal modifier charge -->
+<div class="modal-overlay" id="modal-charge">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">✏️ Modifier la charge</div>
+    <input type="hidden" id="edit-charge-id"/>
+    <div class="form-group"><label class="form-label">Libellé</label><input type="text" class="form-input" id="edit-charge-label"/></div>
+    <div class="form-group"><label class="form-label">Montant (FCFA)</label><input type="number" class="form-input" id="edit-charge-montant"/></div>
+    <div class="btn-row">
+      <button class="btn btn-green" onclick="sauvegarderCharge()">Enregistrer</button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-charge')">Annuler</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════════════
+//  FIREBASE INIT (chargement dynamique pour compatibilité file://)
+// ════════════════════════════════════════
+let db = null;
+let doc, setDoc, getDoc, onSnapshot;
+let firebaseReady;
+
+async function initFirebase(){
+  try{
+    const appMod = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
+    const fsMod = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
+    doc = fsMod.doc; setDoc = fsMod.setDoc; getDoc = fsMod.getDoc; onSnapshot = fsMod.onSnapshot;
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDEzuZqRWd_y16qj9oEX0K4GVil7d4TA84",
+      authDomain: "silextontine21a.firebaseapp.com",
+      projectId: "silextontine21a",
+      storageBucket: "silextontine21a.firebasestorage.app",
+      messagingSenderId: "281122306981",
+      appId: "1:281122306981:web:2ea2cdce81155bff5d864c"
+    };
+
+    const firebaseApp = appMod.initializeApp(firebaseConfig);
+    db = fsMod.getFirestore(firebaseApp);
+
+    window._firestore = db;
+    window._fsDoc = doc;
+    window._fsSetDoc = setDoc;
+    window._fsGetDoc = getDoc;
+    window._fsOnSnapshot = onSnapshot;
+  }catch(e){
+    console.error("Firebase init error (mode hors-ligne uniquement):", e);
+  }
+}
+firebaseReady = initFirebase();
+
+// ════════════════════════════════════════
+//  CONFIG & STORAGE
+// ════════════════════════════════════════
+const PINS = { president:"241202", tresorier:"250001", secretaire:"250002" };
+const ROLE_LABELS = { president:"👑 Président", tresorier:"💼 Trésorier", secretaire:"📋 Secrétaire", membre:"👤 Spectateur" };
+
+let roleActuel = "";
+let membreActuelId = null;
+let pinSaisi = "";
+
+let DB = {
+  config:{ nom:"SilexTech Tontine", anneeDebut:2025, anneeFin:2026, cotisation:2000, tauxMembre:10, tauxExterne:15, agriPct:10 },
+  membres:[], cotisations:[], prets:[], remboursements:[], signature:null, demandesPaiement:[],
+  agri:{pct:10,superficie:2,saison:'Juin - Octobre 2025',arachide_kg:0,arachide_prix:0,soja_kg:0,soja_prix:0},
+  charges:[]
+};
+
+let groupCode = "";
+let currentPage = "bord";
+let syncIntervalId = null;
+let syncing = false;
+let firestoreUnsubscribe = null;
+
+function storageKey(){ return "mecv_db_" + groupCode; }
+function localKey(){ return "mecv_v42_" + groupCode; }
+
+function setSyncStatus(state){
+  const el=document.getElementById("sync-status");
+  if(!el) return;
+  if(!groupCode){ el.textContent="📵"; el.title="Pas de code de groupe — données locales uniquement"; return; }
+  if(state==="ok"){ el.textContent="☁️"; el.title="Synchronisé Firebase — groupe: "+groupCode; }
+  else if(state==="syncing"){ el.textContent="🔄"; el.title="Synchronisation Firebase en cours..."; }
+  else if(state==="err"){ el.textContent="⚠️"; el.title="Erreur Firebase (réseau indisponible)"; }
+}
+
+function save(){
+  DB.lastModified = Date.now();
+  try{ localStorage.setItem(localKey(), JSON.stringify(DB)); }catch(e){}
+  pushToCloud();
+}
+window.save = save;
+
+async function pushToCloud(){
+  if(!groupCode) return;
+  try{
+    await firebaseReady;
+    if(!db){ setSyncStatus("err"); return; }
+    setSyncStatus("syncing");
+    const ref = doc(db, "tontines", storageKey());
+    await setDoc(ref, { data: JSON.stringify(DB), lastModified: DB.lastModified });
+    setSyncStatus("ok");
+  }catch(e){
+    console.error("Firebase push error:", e);
+    setSyncStatus("err");
+  }
+}
+window.pushToCloud = pushToCloud;
+
+function load(){
+  try{ const d=localStorage.getItem(localKey()); if(d) DB=JSON.parse(d); }catch(e){}
+  if(!DB.lastModified) DB.lastModified=0;
+}
+window.load = load;
+
+async function pullFromCloud(showToastMsg){
+  if(!groupCode || syncing) return false;
+  syncing=true;
+  setSyncStatus("syncing");
+  try{
+    await firebaseReady;
+    if(!db){ setSyncStatus("err"); syncing=false; return false; }
+    const ref = doc(db, "tontines", storageKey());
+    const snap = await getDoc(ref);
+    if(snap.exists()){
+      const remote = JSON.parse(snap.data().data);
+      if((remote.lastModified||0) > (DB.lastModified||0)){
+        DB = remote;
+        try{ localStorage.setItem(localKey(), JSON.stringify(DB)); }catch(e){}
+        if(showToastMsg) toast("Données synchronisées depuis Firebase ☁️");
+        if(roleActuel) refreshCurrentPage();
+      }
+    }
+    setSyncStatus("ok");
+  }catch(e){
+    console.error("Firebase pull error:", e);
+    setSyncStatus("err");
+  }
+  syncing=false;
+  return true;
+}
+window.pullFromCloud = pullFromCloud;
+
+async function startFirestoreListener(){
+  if(!groupCode) return;
+  await firebaseReady;
+  if(!db) return;
+  if(firestoreUnsubscribe) firestoreUnsubscribe();
+  const ref = doc(db, "tontines", storageKey());
+  firestoreUnsubscribe = onSnapshot(ref, (snap)=>{
+    if(!snap.exists()) return;
+    try{
+      const remote = JSON.parse(snap.data().data);
+      if((remote.lastModified||0) > (DB.lastModified||0)){
+        DB = remote;
+        try{ localStorage.setItem(localKey(), JSON.stringify(DB)); }catch(e){}
+        if(roleActuel){ toast("Sync temps réel ☁️"); refreshCurrentPage(); }
+      }
+    }catch(e){ console.error("Firestore snapshot parse error:", e); }
+  }, (err)=>{ console.error("Firestore listener error:", err); setSyncStatus("err"); });
+}
+window.startFirestoreListener = startFirestoreListener;
+
+function startSync(){
+  if(!groupCode) return;
+  // Utilise Firestore listener temps réel au lieu d'un setInterval
+  startFirestoreListener();
+  pullFromCloud(false);
+}
+
+function forceSyncNow(){
+  if(!groupCode){ toast("Aucun code de groupe défini",false); return; }
+  pullFromCloud(true).then(()=>pushToCloud());
+}
+
+function refreshCurrentPage(){
+  updateHeader();
+  fillSelects();
+  if(currentPage==="bord") refreshBord();
+  if(currentPage==="cot") affCotisations();
+  if(currentPage==="pret"){ updatePretUI(); affPrets(); }
+  if(currentPage==="fin") refreshFin();
+  if(currentPage==="membres") affMembres();
+  if(currentPage==="config"){ loadConfig(); affDemandes(); }
+  if(currentPage==="agri") refreshAgri();
+  applyRoleUI();
+}
+
+// ════════════════════════════════════════
+//  UTILS
+// ════════════════════════════════════════
+function fcfa(n){ return Number(n||0).toLocaleString("fr-FR")+" FCFA"; }
+function fcfaK(n){ const v=Number(n||0); if(v>=1000000) return (v/1000000).toFixed(1)+"M"; if(v>=1000) return Math.round(v/1000)+"k"; return v+" F"; }
+function initials(name){ return (name||"?").split(" ").map(w=>w[0]||"").join("").toUpperCase().slice(0,2); }
+function nextId(arr){ return arr.length ? Math.max(...arr.map(x=>x.id))+1 : 1; }
+function today(){ return new Date().toISOString().slice(0,10); }
+function toast(msg, ok=true){
+  const el=document.getElementById("toast");
+  el.textContent=(ok?"✓ ":"⚠ ")+msg;
+  el.classList.add("show");
+  setTimeout(()=>el.classList.remove("show"),2800);
+}
+function openModal(id){ document.getElementById(id).classList.add("open"); }
+function closeModal(id){ document.getElementById(id).classList.remove("open"); }
+document.querySelectorAll(".modal-overlay").forEach(m=>{
+  m.addEventListener("click",e=>{ if(e.target===m) m.classList.remove("open"); });
+});
+
+// ════════════════════════════════════════
+//  LOGIN / PIN
+// ════════════════════════════════════════
+function updateLoginUI(){
+  const role = document.getElementById("login-role").value;
+  const memGrp = document.getElementById("login-membre-grp");
+  const memSel = document.getElementById("login-membre-sel");
+  if(role === "membre"){
+    memGrp.style.display = "block";
+    memSel.innerHTML = "";
+    if(!DB.membres.length){
+      memSel.innerHTML = '<option value="">Aucun membre enregistré</option>';
+    } else {
+      DB.membres.forEach(m => {
+        const opt = document.createElement("option");
+        opt.value = m.id;
+        opt.textContent = m.nom + " (" + m.memId + ")";
+        memSel.appendChild(opt);
+      });
+    }
+  } else {
+    memGrp.style.display = "none";
+  }
+  pinSaisi = ""; updatePinDots();
+}
+
+function isAdmin(){ return roleActuel === "president" || roleActuel === "tresorier" || roleActuel === "secretaire"; }
+function isSpectateur(){ return roleActuel === "membre"; }
+
+function pinPress(d){
+  if(pinSaisi.length>=6) return;
+  pinSaisi+=d;
+  updatePinDots();
+  if(pinSaisi.length===6) setTimeout(tryLogin,200);
+}
+function pinDel(){ pinSaisi=pinSaisi.slice(0,-1); updatePinDots(); }
+
+// ── Attacher les listeners du clavier PIN dès le chargement du module ──
+document.querySelectorAll("#pin-pad [data-pin]").forEach(btn => {
+  btn.addEventListener("click", () => pinPress(btn.dataset.pin));
+});
+document.getElementById("pin-del-btn").addEventListener("click", pinDel);
+function updatePinDots(){
+  for(let i=0;i<6;i++){
+    document.getElementById("d"+i).classList.toggle("filled", i<pinSaisi.length);
+  }
+}
+function tryLogin(){
+  const gcEl = document.getElementById("login-groupcode");
+  if(gcEl) groupCode = gcEl.value.trim().toUpperCase();
+  try{ localStorage.setItem("mecv_lastgroup", groupCode); }catch(e){}
+  load();
+  const role=document.getElementById("login-role").value;
+
+  if(role === "membre"){
+    const memId = parseInt(document.getElementById("login-membre-sel").value);
+    const m = DB.membres.find(x => x.id === memId);
+    if(!m){ toast("Sélectionne un membre", false); pinSaisi=""; updatePinDots(); return; }
+    if(!m.pin){ toast("Aucun PIN assigné. Contacte le Président.", false); pinSaisi=""; updatePinDots(); return; }
+    if(pinSaisi !== m.pin){
+      pinSaisi=""; updatePinDots();
+      const disp=document.getElementById("pin-display");
+      disp.style.animation="shake 0.3s";
+      setTimeout(()=>disp.style.animation="",350);
+      toast("PIN incorrect", false); return;
+    }
+    roleActuel = "membre";
+    membreActuelId = memId;
+    document.getElementById("screen-login").style.display="none";
+    document.getElementById("screen-app").style.display="block";
+    document.getElementById("screen-login").classList.remove("active");
+    document.getElementById("screen-app").classList.add("active");
+    document.getElementById("role-badge").textContent = "👤 " + m.nom;
+    updateHeader(); fillSelects(); loadConfig();
+    showPage("bord", document.querySelector(".nav-item"));
+    initPWA(); loadSig();
+    applyRoleUI();
+    setSyncStatus("ok"); startSync();
+    return;
+  }
+
+  if(pinSaisi===PINS[role]){
+    roleActuel=role;
+    membreActuelId=null;
+    document.getElementById("screen-login").style.display="none";
+    document.getElementById("screen-app").style.display="block";
+    document.getElementById("screen-login").classList.remove("active");
+    document.getElementById("screen-app").classList.add("active");
+    document.getElementById("role-badge").textContent=ROLE_LABELS[role];
+    updateHeader();
+    fillSelects();
+    loadConfig();
+    showPage("bord", document.querySelector(".nav-item"));
+    initPWA();
+    loadSig();
+    applyRoleUI();
+    setSyncStatus("ok"); startSync();
+  } else {
+    pinSaisi="";
+    updatePinDots();
+    const disp=document.getElementById("pin-display");
+    disp.style.animation="shake 0.3s";
+    setTimeout(()=>disp.style.animation="",350);
+    toast("PIN incorrect", false);
+  }
+}
+function deconnexion(){ if(syncIntervalId){clearInterval(syncIntervalId);syncIntervalId=null;} if(window.firestoreUnsubscribe){try{window.firestoreUnsubscribe();}catch(e){}} roleActuel=""; membreActuelId=null; pinSaisi=""; updatePinDots(); document.getElementById("screen-app").style.display="none"; document.getElementById("screen-login").style.display="flex"; document.getElementById("screen-app").classList.remove("active"); document.getElementById("screen-login").classList.add("active"); updateLoginUI(); }
+
+// Masquer/afficher les zones d'action selon le rôle
+function applyRoleUI(){
+  const spectateur = isSpectateur();
+  const president = roleActuel === "president";
+
+  // Formulaires d'ajout — masqués pour spectateur
+  ["page-cot","page-pret","page-membres","page-config"].forEach(pid=>{
+    const page = document.getElementById(pid);
+    if(!page) return;
+    page.querySelectorAll(".card").forEach((card,i)=>{
+      if(i===0) card.style.display = spectateur ? "none" : "";
+    });
+  });
+
+  // Boutons d'action dans les tableaux
+  document.querySelectorAll(".admin-only").forEach(el => el.style.display = spectateur ? "none" : "");
+  // Bouton paiement mobile visible uniquement pour spectateur
+  document.querySelectorAll(".spectateur-only").forEach(el => el.style.display = spectateur ? "" : "none");
+
+  // Config : réservé au Président uniquement
+  document.querySelector(".nav-item[onclick*=\"config\"]").style.display = president ? "" : "none";
+
+  // Sections sensibles dans Config visibles uniquement par le Président
+  document.querySelectorAll(".president-only").forEach(el => el.style.display = president ? "" : "none");
+}
+
+// ════════════════════════════════════════
+//  NAVIGATION
+// ════════════════════════════════════════
+const pages=["bord","cot","pret","fin","membres","config","agri"];
+function showPage(id, btn){
+  currentPage = id;
+  pages.forEach(p=>{ document.getElementById("page-"+p).style.display="none"; });
+  document.querySelectorAll(".nav-item").forEach(b=>b.classList.remove("active"));
+  document.getElementById("page-"+id).style.display="block";
+  if(btn) btn.classList.add("active");
+  document.getElementById("screen-app").scrollTo(0,0);
+  if(id==="bord") refreshBord();
+  if(id==="cot"){ fillSelects(); affCotisations(); }
+  if(id==="pret"){ fillSelects(); updatePretUI(); affPrets(); }
+  if(id==="fin") refreshFin();
+  if(id==="membres") affMembres();
+  if(id==="config"){ loadConfig(); affDemandes(); }
+  if(id==="agri") refreshAgri();
+  applyRoleUI();
+}
+
+function updateHeader(){
+  const c=DB.config;
+  document.getElementById("header-cycle").textContent=`${c.nom||"MECV"} — ${c.anneeDebut}/${c.anneeFin}`;
+}
+
+// ════════════════════════════════════════
+//  SELECTS
+// ════════════════════════════════════════
+function fillSelects(){
+  ["cot-m","pt-m","pt-caution","cot-filtre"].forEach(id=>{
+    const sel=document.getElementById(id); if(!sel) return;
+    const prev=sel.value; sel.innerHTML="";
+    if(id==="cot-filtre") sel.appendChild(Object.assign(document.createElement("option"),{value:"",textContent:"Tous"}));
+    DB.membres.forEach(m=>sel.appendChild(Object.assign(document.createElement("option"),{value:m.id,textContent:m.nom})));
+    if(prev) sel.value=prev;
+  });
+}
+
+// ════════════════════════════════════════
+//  BORD
+// ════════════════════════════════════════
+function refreshBord(){
+  updateHeader();
+  const totalCot=DB.cotisations.filter(c=>c.statut==="Payé").reduce((s,c)=>s+c.montant,0);
+  const pretsActifs=DB.prets.filter(p=>p.statut==="En cours");
+  const interets=DB.prets.filter(p=>p.statut==="Remboursé").reduce((s,p)=>s+p.interets,0)
+    + DB.remboursements.filter(r=>r.type==="interet").reduce((s,r)=>s+r.montant,0);
+  const retard=DB.prets.filter(p=>p.statut==="En retard").length;
+  const semaines=[...new Set(DB.cotisations.filter(c=>c.statut==="Payé").map(c=>c.semaine))].length;
+  const pct=Math.round(semaines/52*100);
+  const agri=totalCot*(DB.config.agriPct||0)/100;
+
+  document.getElementById("kpi-capital").textContent=fcfa(totalCot);
+  document.getElementById("kpi-sem").textContent=`Semaine ${semaines} / 52 — ${pct}%`;
+  document.getElementById("prog").style.width=pct+"%";
+  document.getElementById("kpi-pa").textContent=pretsActifs.length;
+  document.getElementById("kpi-int").textContent=fcfaK(interets);
+  document.getElementById("kpi-agr").textContent=fcfaK(agri);
+  document.getElementById("kpi-ret").textContent=retard;
+
+  // Liste membres
+  const el=document.getElementById("bord-liste");
+  if(!DB.membres.length){ el.innerHTML='<div class="empty"><div class="empty-icon">👥</div><div>Aucun membre</div></div>'; }
+  else el.innerHTML=DB.membres.map(m=>{
+    const cotM=DB.cotisations.filter(c=>c.membreId===m.id&&c.statut==="Payé").reduce((s,c)=>s+c.montant,0);
+    const enRet=DB.prets.some(p=>p.membreId===m.id&&p.statut==="En retard");
+    const badge=enRet?'<span class="badge badge-red">En retard</span>':'<span class="badge badge-green">À jour</span>';
+    return `<div class="member-item">
+      <div class="avatar">${initials(m.nom)}</div>
+      <div class="member-info"><div class="member-name">${m.nom}</div><div class="member-meta">${m.id} ${badge}</div></div>
+      <div style="text-align:right"><div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:13px;color:var(--green)">${fcfaK(cotM)}</div><div style="font-size:10px;color:var(--gray)">cotisé</div></div>
+    </div>`;
+  }).join("");
+
+  // Chart finance
+  const chartData=[
+    { label:"Cotisations", val:totalCot, color:"var(--blue)" },
+    { label:"Intérêts", val:interets, color:"var(--gold)" },
+    { label:"Agri", val:agri, color:"var(--green)" },
+    { label:"Prêts actifs", val:pretsActifs.reduce((s,p)=>s+p.montant,0), color:"var(--red)" },
+  ];
+  const maxVal=Math.max(...chartData.map(d=>d.val),1);
+  document.getElementById("chart-finance").innerHTML=chartData.map(d=>`
+    <div class="chart-row">
+      <div class="chart-label">${d.label}</div>
+      <div class="chart-track"><div class="chart-fill" style="width:${Math.round(d.val/maxVal*100)}%;background:${d.color}"></div></div>
+      <div class="chart-val">${fcfaK(d.val)}</div>
+    </div>`).join("");
+}
+
+// ════════════════════════════════════════
+//  COTISATIONS
+// ════════════════════════════════════════
+function enrCotisation(){
+  const membreId=parseInt(document.getElementById("cot-m").value);
+  const semaine=parseInt(document.getElementById("cot-s").value);
+  const montant=parseInt(document.getElementById("cot-amt").value)||DB.config.cotisation||2000;
+  const statut=document.getElementById("cot-stat").value;
+  const mode=document.getElementById("cot-mode").value;
+  if(!membreId||!semaine||semaine<1||semaine>52){ toast("Remplis tous les champs",false); return; }
+  if(DB.cotisations.find(c=>c.membreId===membreId&&c.semaine===semaine)){ toast("Cotisation déjà enregistrée",false); return; }
+  const id=nextId(DB.cotisations);
+  DB.cotisations.push({id,membreId,semaine,montant,statut,mode,date:today()});
+  save(); toast("Cotisation enregistrée");
+  affCotisations();
+  document.getElementById("cot-s").value="";
+  // Générer reçu
+  genRecu({type:"cotisation",id,membreId,semaine,montant,statut,mode});
+}
+
+function affCotisations(){
+  const filtre=document.getElementById("cot-filtre")?.value;
+  let list=[...DB.cotisations].sort((a,b)=>b.semaine-a.semaine);
+  if(filtre) list=list.filter(c=>c.membreId===parseInt(filtre));
+  const el=document.getElementById("cot-liste");
+  if(!list.length){ el.innerHTML='<div class="empty"><div class="empty-icon">📋</div><div>Aucune cotisation</div></div>'; return; }
+  el.innerHTML=`<div class="tbl-wrap"><table>
+    <tr><th>Sem.</th><th>Membre</th><th>Montant</th><th>Statut</th><th>Mode</th><th></th></tr>
+    ${list.map(c=>{
+      const m=DB.membres.find(x=>x.id===c.membreId)||{nom:"?"};
+      const bc=c.statut==="Payé"?"badge-green":c.statut==="Retard"?"badge-gold":"badge-red";
+      return `<tr>
+        <td style="font-weight:600">#${c.semaine}</td>
+        <td>${m.nom.split(" ")[0]}</td>
+        <td style="font-family:'Space Grotesk',sans-serif;font-weight:600;color:var(--blue)">${Number(c.montant).toLocaleString("fr-FR")}</td>
+        <td><span class="badge ${bc}">${c.statut}</span></td>
+        <td style="font-size:10px;color:var(--gray)">${c.mode||"—"}</td>
+        <td style="white-space:nowrap">
+          <button class="btn btn-ghost btn-sm admin-only" onclick="ouvrirEditCot(${c.id})" style="margin-right:3px">✏️</button>
+          <button class="btn btn-ghost btn-sm" onclick="genRecuCot(${c.id})">🧾</button>
+          <button class="btn btn-ghost btn-sm admin-only" onclick="suppCot(${c.id})" style="color:var(--red)">✕</button>
+          ${c.statut!=="Payé"?`<button class="btn btn-green btn-sm spectateur-only" onclick="ouvrirMobilePay(${c.id},'cotisation')" style="display:none">📱 Payer</button>`:""}
+        </td>
+      </tr>`;
+    }).join("")}
+  </table></div>`;
+}
+
+function ouvrirEditCot(id){
+  const c=DB.cotisations.find(x=>x.id===id); if(!c) return;
+  document.getElementById("edit-c-id").value=id;
+  document.getElementById("edit-c-amt").value=c.montant;
+  document.getElementById("edit-c-stat").value=c.statut;
+  document.getElementById("edit-c-mode").value=c.mode||"Espèces";
+  openModal("modal-edit-c");
+}
+function saveEditCot(){
+  const id=parseInt(document.getElementById("edit-c-id").value);
+  const c=DB.cotisations.find(x=>x.id===id); if(!c) return;
+  c.montant=parseInt(document.getElementById("edit-c-amt").value)||c.montant;
+  c.statut=document.getElementById("edit-c-stat").value;
+  c.mode=document.getElementById("edit-c-mode").value;
+  save(); closeModal("modal-edit-c"); affCotisations(); toast("Cotisation modifiée");
+}
+function suppCot(id){
+  if(roleActuel!=="president"){ toast("Réservé au Président",false); return; }
+  DB.cotisations=DB.cotisations.filter(c=>c.id!==id);
+  save(); affCotisations(); toast("Cotisation supprimée");
+}
+function genRecuCot(id){
+  const c=DB.cotisations.find(x=>x.id===id); if(!c) return;
+  genRecu({type:"cotisation",...c});
+}
+
+// ════════════════════════════════════════
+//  PRÊTS
+// ════════════════════════════════════════
+function updatePretUI(){
+  const type=document.getElementById("pt-type").value;
+  document.getElementById("pt-m-grp").style.display=type==="Membre"?"":"none";
+  document.getElementById("pt-e-grp").style.display=type==="Externe"?"":"none";
+  document.getElementById("pt-c-grp").style.display=type==="Externe"?"":"none";
+  document.getElementById("rcp-taux").textContent=type==="Membre"?`${DB.config.tauxMembre||10}%`:`${DB.config.tauxExterne||15}%`;
+  calcPretRecap();
+}
+
+function calcPretRecap(){
+  const type=document.getElementById("pt-type").value;
+  const amt=parseFloat(document.getElementById("pt-amt").value)||0;
+  const taux=type==="Membre"?(DB.config.tauxMembre||10)/100:(DB.config.tauxExterne||15)/100;
+  const int=amt*taux;
+  const dateStr=document.getElementById("pt-date").value;
+  let lim="—";
+  if(dateStr){ const d=new Date(dateStr);d.setDate(d.getDate()+92);lim=d.toLocaleDateString("fr-FR"); }
+  document.getElementById("rcp-int").textContent=fcfa(int);
+  document.getElementById("rcp-tot").textContent=fcfa(amt+int);
+  document.getElementById("rcp-lim").textContent=lim;
+}
+
+function enrPret(){
+  const type=document.getElementById("pt-type").value;
+  const amt=parseFloat(document.getElementById("pt-amt").value)||0;
+  const date=document.getElementById("pt-date").value;
+  if(amt<=0||!date){ toast("Montant et date obligatoires",false); return; }
+  let emprunteur, membreId=null;
+  if(type==="Membre"){
+    membreId=parseInt(document.getElementById("pt-m").value);
+    const m=DB.membres.find(x=>x.id===membreId); if(!m){ toast("Membre introuvable",false); return; }
+    emprunteur=m.nom;
+    const mise=DB.cotisations.filter(c=>c.membreId===membreId&&c.statut==="Payé").reduce((s,c)=>s+c.montant,0);
+    const plafond=mise*3;
+    const actif=DB.prets.filter(p=>p.membreId===membreId&&p.statut==="En cours").reduce((s,p)=>s+p.montant,0);
+    if(amt+actif>plafond){ toast(`Plafond dépassé ! Max: ${fcfa(plafond-actif)}`,false); return; }
+  } else {
+    emprunteur=document.getElementById("pt-enom").value.trim();
+    if(!emprunteur){ toast("Nom de l'externe obligatoire",false); return; }
+  }
+  const taux=type==="Membre"?(DB.config.tauxMembre||10)/100:(DB.config.tauxExterne||15)/100;
+  const interets=amt*taux;
+  const d=new Date(date);d.setDate(d.getDate()+92);
+  const id=nextId(DB.prets);
+  DB.prets.push({id,type,emprunteur,membreId,montant:amt,interets,date,dateLimite:d.toISOString().slice(0,10),statut:"En cours",dateRemb:null,restedu:amt+interets});
+  save(); toast("Prêt accordé"); affPrets();
+  document.getElementById("pt-amt").value="";
+  genRecu({type:"pret",id,emprunteur,membreId,montant:amt,interets,date,dateLimite:d.toISOString().slice(0,10)});
+}
+
+function affPrets(){
+  const actifs=DB.prets.filter(p=>p.statut!=="Remboursé");
+  const el=document.getElementById("pret-liste");
+  if(!actifs.length){ el.innerHTML='<div class="empty"><div class="empty-icon">📋</div><div>Aucun prêt actif</div></div>'; }
+  else el.innerHTML=actifs.map(p=>{
+    const today2=new Date(); const lim=new Date(p.dateLimite);
+    if(today2>lim&&p.statut==="En cours"){ p.statut="En retard"; save(); }
+    const bc=p.statut==="En cours"?"badge-blue":p.statut==="En retard"?"badge-red":"badge-green";
+    // Calculer reste dû basé sur remboursements partiels
+    const deja=DB.remboursements.filter(r=>r.pretId===p.id).reduce((s,r)=>s+r.montant,0);
+    const reste=Math.max(0,(p.montant+p.interets)-deja);
+    return `<div class="pret-card">
+      <div class="pret-header">
+        <div><div class="pret-name">${p.emprunteur}</div><div class="pret-type">${p.type} · ${new Date(p.date).toLocaleDateString("fr-FR")}</div></div>
+        <span class="badge ${bc}">${p.statut}</span>
+      </div>
+      <div class="pret-amounts">
+        <div class="amt-box"><div class="amt-label">Prêté</div><div class="amt-val" style="color:var(--blue)">${Number(p.montant).toLocaleString("fr-FR")} F</div></div>
+        <div class="amt-box"><div class="amt-label">Reste dû</div><div class="amt-val" style="color:var(--gold)">${Number(reste).toLocaleString("fr-FR")} F</div></div>
+      </div>
+      <div style="font-size:11px;color:var(--gray);margin-bottom:8px">⏰ Limite : ${new Date(p.dateLimite).toLocaleDateString("fr-FR")}</div>
+      <div class="btn-row">
+        <button class="btn btn-ghost btn-sm admin-only" onclick="ouvrirEditPret(${p.id})">✏️</button>
+        <button class="btn btn-green btn-sm admin-only" style="flex:1" onclick="ouvrirRemb(${p.id})">💳 Remboursement</button>
+        <button class="btn btn-blue btn-sm spectateur-only" style="flex:1;display:none" onclick="ouvrirMobilePay(${p.id},'remboursement')">📱 Payer Mobile</button>
+        <button class="btn btn-blue btn-sm" onclick="genRecuPret(${p.id})">🧾</button>
+        <button class="btn btn-ghost btn-sm admin-only" onclick="suppPret(${p.id})" style="color:var(--red)">✕</button>
+      </div>
+    </div>`;
+  }).join("");
+
+  // Historique remboursements
+  const elH=document.getElementById("remb-liste");
+  if(!DB.remboursements.length){ elH.innerHTML='<div class="empty"><div class="empty-icon">💳</div><div>Aucun remboursement</div></div>'; return; }
+  elH.innerHTML=`<div class="tbl-wrap"><table>
+    <tr><th>Date</th><th>Emprunteur</th><th>Versé</th><th>Mode</th><th>Reçu</th></tr>
+    ${[...DB.remboursements].reverse().map(r=>{
+      const p=DB.prets.find(x=>x.id===r.pretId)||{emprunteur:"?"};
+      return `<tr>
+        <td>${new Date(r.date).toLocaleDateString("fr-FR")}</td>
+        <td>${p.emprunteur.split(" ")[0]}</td>
+        <td style="font-family:'Space Grotesk',sans-serif;font-weight:600;color:var(--green)">${Number(r.montant).toLocaleString("fr-FR")} F</td>
+        <td style="font-size:10px;color:var(--gray)">${r.mode||"—"}</td>
+        <td><button class="btn btn-ghost btn-sm" onclick="genRecuRemb(${r.id})">🧾</button></td>
+      </tr>`;
+    }).join("")}
+  </table></div>`;
+}
+
+function ouvrirEditPret(id){
+  const p=DB.prets.find(x=>x.id===id); if(!p) return;
+  document.getElementById("edit-p-id").value=id;
+  document.getElementById("edit-p-amt").value=p.montant;
+  document.getElementById("edit-p-date").value=p.date;
+  document.getElementById("edit-p-stat").value=p.statut;
+  document.getElementById("edit-p-int").textContent=fcfa(p.interets);
+  document.getElementById("edit-p-tot").textContent=fcfa(p.montant+p.interets);
+  openModal("modal-edit-p");
+}
+function calcEditPret(){
+  const id=parseInt(document.getElementById("edit-p-id").value);
+  const p=DB.prets.find(x=>x.id===id); if(!p) return;
+  const amt=parseFloat(document.getElementById("edit-p-amt").value)||0;
+  const taux=p.type==="Membre"?(DB.config.tauxMembre||10)/100:(DB.config.tauxExterne||15)/100;
+  document.getElementById("edit-p-int").textContent=fcfa(amt*taux);
+  document.getElementById("edit-p-tot").textContent=fcfa(amt+amt*taux);
+}
+function saveEditPret(){
+  const id=parseInt(document.getElementById("edit-p-id").value);
+  const p=DB.prets.find(x=>x.id===id); if(!p) return;
+  const amt=parseFloat(document.getElementById("edit-p-amt").value)||p.montant;
+  const taux=p.type==="Membre"?(DB.config.tauxMembre||10)/100:(DB.config.tauxExterne||15)/100;
+  p.montant=amt; p.interets=amt*taux;
+  p.date=document.getElementById("edit-p-date").value||p.date;
+  p.statut=document.getElementById("edit-p-stat").value;
+  const d=new Date(p.date);d.setDate(d.getDate()+92);
+  p.dateLimite=d.toISOString().slice(0,10);
+  save(); closeModal("modal-edit-p"); affPrets(); toast("Prêt modifié");
+}
+function suppPret(id){
+  if(roleActuel!=="president"){ toast("Réservé au Président",false); return; }
+  DB.prets=DB.prets.filter(p=>p.id!==id);
+  DB.remboursements=DB.remboursements.filter(r=>r.pretId!==id);
+  save(); affPrets(); toast("Prêt supprimé");
+}
+
+// Remboursement partiel/total
+function ouvrirRemb(pretId){
+  const p=DB.prets.find(x=>x.id===pretId); if(!p) return;
+  const deja=DB.remboursements.filter(r=>r.pretId===pretId).reduce((s,r)=>s+r.montant,0);
+  const reste=Math.max(0,(p.montant+p.interets)-deja);
+  document.getElementById("remb-pret-id").value=pretId;
+  document.getElementById("remb-info").innerHTML=`<b>${p.emprunteur}</b> — Reste dû : <span style="color:var(--gold);font-weight:700">${fcfa(reste)}</span>`;
+  document.getElementById("remb-amt").value=reste;
+  document.getElementById("remb-date").value=today();
+  openModal("modal-remb");
+}
+function saveRemb(){
+  const pretId=parseInt(document.getElementById("remb-pret-id").value);
+  const montant=parseFloat(document.getElementById("remb-amt").value)||0;
+  const date=document.getElementById("remb-date").value||today();
+  const mode=document.getElementById("remb-mode").value;
+  if(montant<=0){ toast("Montant invalide",false); return; }
+  const p=DB.prets.find(x=>x.id===pretId); if(!p) return;
+  const id=nextId(DB.remboursements);
+  DB.remboursements.push({id,pretId,montant,date,mode});
+  // Vérifier si entièrement remboursé
+  const total=DB.remboursements.filter(r=>r.pretId===pretId).reduce((s,r)=>s+r.montant,0);
+  if(total>=(p.montant+p.interets)-1){ p.statut="Remboursé"; p.dateRemb=date; }
+  save(); closeModal("modal-remb"); affPrets(); toast("Remboursement enregistré");
+  genRecu({type:"remboursement",id,pretId,emprunteur:p.emprunteur,montant,date,mode,total,pretTotal:p.montant+p.interets});
+}
+function genRecuPret(id){ const p=DB.prets.find(x=>x.id===id); if(p) genRecu({type:"pret",...p}); }
+function genRecuRemb(id){ const r=DB.remboursements.find(x=>x.id===id); if(!r) return; const p=DB.prets.find(x=>x.id===r.pretId)||{emprunteur:"?"}; genRecu({type:"remboursement",...r,emprunteur:p.emprunteur}); }
+
+// ════════════════════════════════════════
+//  TABLEAU FINANCIER
+// ════════════════════════════════════════
+function refreshFin(){
+  const totalCot=DB.cotisations.filter(c=>c.statut==="Payé").reduce((s,c)=>s+c.montant,0);
+  const iM=DB.prets.filter(p=>p.statut==="Remboursé"&&p.type==="Membre").reduce((s,p)=>s+p.interets,0);
+  const iE=DB.prets.filter(p=>p.statut==="Remboursé"&&p.type==="Externe").reduce((s,p)=>s+p.interets,0);
+  const iR=DB.remboursements.reduce((s,r)=>{
+    const p=DB.prets.find(x=>x.id===r.pretId);
+    if(!p||p.statut!=="Remboursé") return s;
+    return s;
+  },0);
+  const totalInt=iM+iE;
+  const totalBenef=totalInt;
+  const mises=DB.membres.map(m=>({ m, mise:DB.cotisations.filter(c=>c.membreId===m.id&&c.statut==="Payé").reduce((s,c)=>s+c.montant,0) }));
+  const totalMises=mises.reduce((s,x)=>s+x.mise,0);
+
+  document.getElementById("fin-recap").innerHTML=`
+    <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05)"><span style="font-size:13px">Cotisations encaissées</span><strong style="color:var(--blue)">${fcfa(totalCot)}</strong></div>
+    <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05)"><span style="font-size:13px">Intérêts membres (${DB.config.tauxMembre||10}%)</span><strong style="color:var(--gold)">${fcfa(iM)}</strong></div>
+    <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05)"><span style="font-size:13px">Intérêts externes (${DB.config.tauxExterne||15}%)</span><strong style="color:var(--gold)">${fcfa(iE)}</strong></div>
+    <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05)"><span style="font-size:13px">Prêts en cours</span><strong style="color:var(--red)">${fcfa(DB.prets.filter(p=>p.statut==="En cours").reduce((s,p)=>s+p.montant,0))}</strong></div>
+    <div style="display:flex;justify-content:space-between;padding:10px 0;background:rgba(240,180,41,0.06);border-radius:8px;padding:10px;margin-top:6px"><span style="font-size:14px;font-weight:700">Total bénéfices</span><strong style="font-family:'Space Grotesk',sans-serif;font-size:16px;color:var(--gold)">${fcfa(totalBenef)}</strong></div>`;
+
+  document.getElementById("fin-distrib").innerHTML=!DB.membres.length?'<div class="empty"><div>Aucun membre</div></div>':
+    mises.map(({m,mise})=>{
+      const part=totalMises>0?(mise/totalMises*totalBenef):0;
+      return `<div class="member-item">
+        <div class="avatar">${initials(m.nom)}</div>
+        <div class="member-info"><div class="member-name">${m.nom}</div><div class="member-meta">Mise : ${fcfa(mise)} · Bénéfice : <span style="color:var(--green)">${fcfa(Math.round(part))}</span></div></div>
+        <div style="text-align:right"><div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:13px;color:var(--gold)">${fcfa(Math.round(mise+part))}</div><div style="font-size:10px;color:var(--gray)">à recevoir</div></div>
+      </div>`;
+    }).join("");
+
+  // Chart performance membres
+  const maxMise=Math.max(...mises.map(x=>x.mise),1);
+  document.getElementById("chart-perf").innerHTML=mises.map(({m,mise})=>`
+    <div class="chart-row">
+      <div class="chart-label">${m.nom.split(" ")[0]}</div>
+      <div class="chart-track"><div class="chart-fill" style="width:${Math.round(mise/maxMise*100)}%;background:linear-gradient(90deg,var(--blue),var(--gold))"></div></div>
+      <div class="chart-val">${fcfaK(mise)}</div>
+    </div>`).join("");
+}
+
+// ════════════════════════════════════════
+//  MEMBRES
+// ════════════════════════════════════════
+function ajouterMembre(){
+  const nom=document.getElementById("mb-nom").value.trim();
+  const tel=document.getElementById("mb-tel").value.trim();
+  const sexe=document.getElementById("mb-sexe").value;
+  const adr=document.getElementById("mb-adr").value.trim();
+  if(!nom){ toast("Nom obligatoire",false); return; }
+  const id=nextId(DB.membres);
+  const memId="MECV-"+String(id).padStart(3,"0");
+  DB.membres.push({id,memId,nom,tel,sexe,adresse:adr,date:today()});
+  save(); fillSelects(); affMembres();
+  ["mb-nom","mb-tel","mb-adr"].forEach(i=>document.getElementById(i).value="");
+  toast(`${nom} ajouté`);
+}
+
+function affMembres(){
+  const q=(document.getElementById("mb-search")?.value||"").toLowerCase();
+  const list=DB.membres.filter(m=>m.nom.toLowerCase().includes(q)||m.memId.toLowerCase().includes(q));
+  const el=document.getElementById("mb-liste");
+  if(!list.length){ el.innerHTML='<div class="empty"><div class="empty-icon">👥</div><div>Aucun membre</div></div>'; return; }
+  el.innerHTML=list.map(m=>`
+    <div class="member-item">
+      <div class="avatar" style="background:${m.sexe==="Femme"?"rgba(240,180,41,0.1)":"var(--blue-glow)"};">${initials(m.nom)}</div>
+      <div class="member-info">
+        <div class="member-name">${m.nom}</div>
+        <div class="member-meta">${m.memId} · ${m.sexe} · ${m.tel||"—"}</div>
+      </div>
+      <div style="display:flex;gap:5px">
+        <button class="btn btn-ghost btn-sm admin-only" onclick="ouvrirEditM(${m.id})">✏️</button>
+        <button class="btn btn-ghost btn-sm admin-only" onclick="suppM(${m.id})" style="color:var(--red)">✕</button>
+        ${m.pin?'<span class="badge badge-green" style="line-height:28px">🔑 PIN</span>':'<span class="badge badge-red" style="line-height:28px">Sans PIN</span>'}
+      </div>
+    </div>`).join("");
+}
+
+function ouvrirEditM(id){
+  const m=DB.membres.find(x=>x.id===id); if(!m) return;
+  document.getElementById("edit-m-id").value=id;
+  document.getElementById("edit-m-nom").value=m.nom;
+  document.getElementById("edit-m-tel").value=m.tel||"";
+  document.getElementById("edit-m-adr").value=m.adresse||"";
+  document.getElementById("edit-m-pin").value="";
+  openModal("modal-edit-m");
+}
+function saveEditMembre(){
+  const id=parseInt(document.getElementById("edit-m-id").value);
+  const m=DB.membres.find(x=>x.id===id); if(!m) return;
+  m.nom=document.getElementById("edit-m-nom").value.trim()||m.nom;
+  m.tel=document.getElementById("edit-m-tel").value.trim();
+  m.adresse=document.getElementById("edit-m-adr").value.trim();
+  const pin=document.getElementById("edit-m-pin").value.trim();
+  if(pin){
+    if(!/^\d{6}$/.test(pin)){ toast("Le PIN doit être 6 chiffres",false); return; }
+    m.pin=pin;
+  }
+  save(); closeModal("modal-edit-m"); fillSelects(); affMembres(); toast("Membre modifié" + (pin?" + PIN mis à jour":""));
+}
+function suppM(id){
+  if(roleActuel!=="president"){ toast("Réservé au Président",false); return; }
+  const m=DB.membres.find(x=>x.id===id);
+  DB.membres=DB.membres.filter(x=>x.id!==id);
+  save(); fillSelects(); affMembres(); toast(`${m?.nom} retiré`);
+}
+
+// ════════════════════════════════════════
+//  CONFIG
+// ════════════════════════════════════════
+function loadConfig(){
+  const c=DB.config;
+  document.getElementById("cfg-nom").value=c.nom||"";
+  document.getElementById("cfg-ad").value=c.anneeDebut||2025;
+  document.getElementById("cfg-af").value=c.anneeFin||2026;
+  document.getElementById("cfg-cot").value=c.cotisation||2000;
+  document.getElementById("cfg-tm").value=c.tauxMembre||10;
+  document.getElementById("cfg-te").value=c.tauxExterne||15;
+  document.getElementById("cfg-agri").value=c.agriPct||10;
+}
+function saveCfg(){
+  if(roleActuel!=="president"){ toast("Réservé au Président",false); return; }
+  DB.config.nom=document.getElementById("cfg-nom").value.trim()||DB.config.nom;
+  DB.config.anneeDebut=parseInt(document.getElementById("cfg-ad").value)||DB.config.anneeDebut;
+  DB.config.anneeFin=parseInt(document.getElementById("cfg-af").value)||DB.config.anneeFin;
+  DB.config.cotisation=parseInt(document.getElementById("cfg-cot").value)||DB.config.cotisation;
+  DB.config.tauxMembre=parseFloat(document.getElementById("cfg-tm").value)||DB.config.tauxMembre;
+  DB.config.tauxExterne=parseFloat(document.getElementById("cfg-te").value)||DB.config.tauxExterne;
+  DB.config.agriPct=parseFloat(document.getElementById("cfg-agri").value)||DB.config.agriPct;
+  save(); updateHeader(); toast("Paramètres enregistrés");
+}
+function reinitCycle(){
+  if(roleActuel!=="president"){ toast("Réservé au Président",false); return; }
+  if(!confirm("Confirmes-tu la réinitialisation du cycle ?")) return;
+  DB.cotisations=[]; DB.prets=[]; DB.remboursements=[];
+  save(); toast("Cycle réinitialisé");
+}
+function exporterDonnees(){
+  const blob=new Blob([JSON.stringify(DB,null,2)],{type:"application/json"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
+  a.download=`MECV_Sauvegarde_${today()}.json`; a.click();
+  toast("Données exportées");
+}
+
+function affDemandes(){
+  if(!isAdmin()) return;
+  const el = document.getElementById("demandes-liste");
+  if(!el) return;
+  const list = (DB.demandesPaiement||[]).filter(d=>d.statut==="En attente");
+  if(!list.length){ el.innerHTML='<div class="empty"><div class="empty-icon">📭</div><div>Aucune demande en attente</div></div>'; return; }
+  el.innerHTML = list.map(d=>`
+    <div class="pret-card" style="margin-bottom:8px">
+      <div style="font-weight:600;font-size:13px;margin-bottom:4px">👤 ${d.membreNom} · <span style="color:var(--gray);font-weight:400">${d.type==="cotisation"?"Cotisation":"Remboursement prêt"}</span></div>
+      <div style="font-size:12px;color:var(--gray);margin-bottom:4px">📱 ${d.mode} · Réf : <strong style="color:var(--white)">${d.ref}</strong> · ${d.date}</div>
+      <div class="btn-row" style="margin-top:8px">
+        <button class="btn btn-green btn-sm" style="flex:1" onclick="validerDemande(${d.id},true)">✅ Valider</button>
+        <button class="btn btn-red btn-sm" style="flex:1" onclick="validerDemande(${d.id},false)">❌ Rejeter</button>
+      </div>
+    </div>`).join("");
+}
+
+function validerDemande(id, accepter){
+  const d = (DB.demandesPaiement||[]).find(x=>x.id===id); if(!d) return;
+  d.statut = accepter ? "Validé" : "Rejeté";
+  if(accepter){
+    if(d.type==="cotisation"){
+      const c = DB.cotisations.find(x=>x.id===d.refId);
+      if(c){ c.statut="Payé"; c.mode=d.mode; }
+    } else {
+      // remboursement partiel
+      const p = DB.prets.find(x=>x.id===d.refId);
+      if(p){
+        const deja = DB.remboursements.filter(r=>r.pretId===p.id).reduce((s,r)=>s+r.montant,0);
+        const reste = Math.max(0,(p.montant+p.interets)-deja);
+        const rid = nextId(DB.remboursements);
+        DB.remboursements.push({id:rid, pretId:p.id, montant:reste, date:d.date, mode:d.mode});
+        const total2 = DB.remboursements.filter(r=>r.pretId===p.id).reduce((s,r)=>s+r.montant,0);
+        if(total2>=(p.montant+p.interets)-1){ p.statut="Remboursé"; p.dateRemb=d.date; }
+      }
+    }
+    toast("Paiement validé et enregistré ✅");
+  } else {
+    toast("Demande rejetée");
+  }
+  save(); affDemandes();
+}
+
+// ════════════════════════════════════════
+//  PAIEMENT MOBILE (spectateur)
+// ════════════════════════════════════════
+let mobilePayCtx = null; // {id, type}
+
+function ouvrirMobilePay(id, type){
+  mobilePayCtx = {id, type};
+  let info = "";
+  if(type === "cotisation"){
+    const c = DB.cotisations.find(x=>x.id===id);
+    const m = c ? DB.membres.find(x=>x.id===c.membreId) : null;
+    info = `Cotisation semaine <strong>#${c?.semaine}</strong> — Membre : <strong>${m?.nom||"?"}</strong> — Montant : <strong style="color:var(--gold)">${fcfa(c?.montant)}</strong>`;
+  } else {
+    const p = DB.prets.find(x=>x.id===id);
+    const deja = DB.remboursements.filter(r=>r.pretId===id).reduce((s,r)=>s+r.montant,0);
+    const reste = Math.max(0,(p?.montant+p?.interets)-deja);
+    info = `Remboursement prêt — Emprunteur : <strong>${p?.emprunteur||"?"}</strong> — Reste dû : <strong style="color:var(--gold)">${fcfa(reste)}</strong>`;
+  }
+  document.getElementById("mobile-pay-info").innerHTML = info;
+  document.getElementById("mpay-ref").value = "";
+  openModal("modal-mobile-pay");
+}
+
+function envoyerDemandePaiement(){
+  if(!mobilePayCtx){ closeModal("modal-mobile-pay"); return; }
+  const ref = document.getElementById("mpay-ref").value.trim();
+  const mode = document.getElementById("mpay-mode").value;
+  if(!ref){ toast("Saisis le numéro de transaction", false); return; }
+  if(!DB.demandesPaiement) DB.demandesPaiement = [];
+  const m = DB.membres.find(x=>x.id===membreActuelId);
+  DB.demandesPaiement.push({
+    id: Date.now(),
+    membreId: membreActuelId,
+    membreNom: m?.nom||"?",
+    type: mobilePayCtx.type,
+    refId: mobilePayCtx.id,
+    mode, ref,
+    date: today(),
+    statut: "En attente"
+  });
+  save();
+  closeModal("modal-mobile-pay");
+  toast("Demande envoyée ! En attente de validation par le Trésorier.");
+  mobilePayCtx = null;
+}
+
+// ════════════════════════════════════════
+//  SIGNATURE PAD
+// ════════════════════════════════════════
+let sigDrawing=false;
+let sigCtx=null;
+
+function initSig(){
+  const canvas=document.getElementById("sig-canvas");
+  if(!canvas) return;
+  sigCtx=canvas.getContext("2d");
+  sigCtx.strokeStyle="#36a3ff"; sigCtx.lineWidth=2; sigCtx.lineCap="round"; sigCtx.lineJoin="round";
+
+  function getPos(e){
+    const r=canvas.getBoundingClientRect();
+    const src=e.touches?e.touches[0]:e;
+    return {x:(src.clientX-r.left)*(canvas.width/r.width), y:(src.clientY-r.top)*(canvas.height/r.height)};
+  }
+  canvas.addEventListener("mousedown",e=>{sigDrawing=true;const p=getPos(e);sigCtx.beginPath();sigCtx.moveTo(p.x,p.y);});
+  canvas.addEventListener("mousemove",e=>{if(!sigDrawing)return;const p=getPos(e);sigCtx.lineTo(p.x,p.y);sigCtx.stroke();});
+  canvas.addEventListener("mouseup",()=>sigDrawing=false);
+  canvas.addEventListener("touchstart",e=>{e.preventDefault();sigDrawing=true;const p=getPos(e);sigCtx.beginPath();sigCtx.moveTo(p.x,p.y);},{passive:false});
+  canvas.addEventListener("touchmove",e=>{e.preventDefault();if(!sigDrawing)return;const p=getPos(e);sigCtx.lineTo(p.x,p.y);sigCtx.stroke();},{passive:false});
+  canvas.addEventListener("touchend",()=>sigDrawing=false);
+  if(DB.signature) loadSigFromDB();
+}
+
+function clearSig(){ if(roleActuel!=="president"){ toast("Réservé au Président",false); return; } if(sigCtx){ sigCtx.clearRect(0,0,400,120); } }
+function saveSig(){
+  if(roleActuel!=="president"){ toast("Réservé au Président",false); return; }
+  const canvas=document.getElementById("sig-canvas");
+  DB.signature=canvas.toDataURL();
+  save(); toast("Signature sauvegardée");
+}
+function loadSig(){
+  setTimeout(()=>{
+    initSig();
+    if(DB.signature){ loadSigFromDB(); }
+  },300);
+}
+function loadSigFromDB(){
+  const canvas=document.getElementById("sig-canvas");
+  const ctx=canvas?.getContext("2d"); if(!ctx||!DB.signature) return;
+  const img=new Image(); img.onload=()=>ctx.drawImage(img,0,0); img.src=DB.signature;
+}
+
+// ════════════════════════════════════════
+//  GÉNÉRATION REÇUS PDF (via print)
+// ════════════════════════════════════════
+function genRecu(data){
+  const m = data.membreId ? DB.membres.find(x=>x.id===data.membreId) : null;
+  const sigImg = DB.signature ? `<img src="${DB.signature}" style="height:50px;display:block;margin-top:4px"/>` : '<div style="height:50px;border-bottom:1px solid #ccc;width:200px;margin-top:4px"></div>';
+  const date = new Date().toLocaleDateString("fr-FR");
+  const heure = new Date().toLocaleTimeString("fr-FR");
+
+  let corps="", titre="";
+  if(data.type==="cotisation"){
+    titre="REÇU DE COTISATION";
+    corps=`
+      <tr><td>Membre</td><td><b>${m?.nom||"—"}</b></td></tr>
+      <tr><td>ID Membre</td><td>${m?.memId||"—"}</td></tr>
+      <tr><td>Semaine N°</td><td>${data.semaine}</td></tr>
+      <tr><td>Montant versé</td><td><b style="color:#1a7bd4;font-size:16px">${Number(data.montant).toLocaleString("fr-FR")} FCFA</b></td></tr>
+      <tr><td>Mode de paiement</td><td>${data.mode||"Espèces"}</td></tr>
+      <tr><td>Statut</td><td>${data.statut}</td></tr>`;
+  } else if(data.type==="pret"){
+    titre="REÇU D'OCTROI DE PRÊT";
+    corps=`
+      <tr><td>Emprunteur</td><td><b>${data.emprunteur}</b></td></tr>
+      <tr><td>Type</td><td>${data.type==="Membre"?"Membre":"Externe"}</td></tr>
+      <tr><td>Montant du prêt</td><td><b style="color:#1a7bd4;font-size:16px">${Number(data.montant).toLocaleString("fr-FR")} FCFA</b></td></tr>
+      <tr><td>Intérêts (${data.type==="Membre"?DB.config.tauxMembre:DB.config.tauxExterne}%)</td><td>${Number(data.interets).toLocaleString("fr-FR")} FCFA</td></tr>
+      <tr><td>Total à rembourser</td><td><b>${Number(data.montant+data.interets).toLocaleString("fr-FR")} FCFA</b></td></tr>
+      <tr><td>Date d'octroi</td><td>${new Date(data.date).toLocaleDateString("fr-FR")}</td></tr>
+      <tr><td>Date limite</td><td>${new Date(data.dateLimite).toLocaleDateString("fr-FR")}</td></tr>`;
+  } else {
+    titre="REÇU DE REMBOURSEMENT";
+    const total=DB.remboursements.filter(r=>r.pretId===data.pretId).reduce((s,r)=>s+r.montant,0);
+    const pret=DB.prets.find(x=>x.id===data.pretId);
+    corps=`
+      <tr><td>Emprunteur</td><td><b>${data.emprunteur}</b></td></tr>
+      <tr><td>Montant versé</td><td><b style="color:#22c55e;font-size:16px">${Number(data.montant).toLocaleString("fr-FR")} FCFA</b></td></tr>
+      <tr><td>Total remboursé</td><td>${Number(total).toLocaleString("fr-FR")} FCFA</td></tr>
+      <tr><td>Reste dû</td><td>${Number(Math.max(0,(pret?.montant+pret?.interets||0)-total)).toLocaleString("fr-FR")} FCFA</td></tr>
+      <tr><td>Mode de paiement</td><td>${data.mode||"Espèces"}</td></tr>
+      <tr><td>Date</td><td>${new Date(data.date).toLocaleDateString("fr-FR")}</td></tr>`;
+  }
+
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <style>
+    body{font-family:Arial,sans-serif;margin:0;padding:20px;color:#0f1923;font-size:13px;}
+    .header{text-align:center;border-bottom:3px solid #36a3ff;padding-bottom:14px;margin-bottom:16px;}
+    .logo{font-size:24px;font-weight:900;color:#36a3ff;letter-spacing:2px;}
+    .sub{font-size:11px;color:#6b7280;margin-top:3px;}
+    h2{font-size:16px;color:#1a5276;text-align:center;margin:10px 0;}
+    table{width:100%;border-collapse:collapse;margin:10px 0;}
+    td{padding:8px 10px;border-bottom:1px solid #e5e7eb;font-size:13px;}
+    td:first-child{color:#6b7280;width:45%;}
+    .footer{margin-top:20px;display:flex;justify-content:space-between;border-top:1px solid #e5e7eb;padding-top:14px;}
+    .sig-block{text-align:center;}
+    .sig-label{font-size:11px;color:#6b7280;margin-bottom:4px;}
+    .recu-num{font-size:11px;color:#94a3b8;text-align:center;margin-top:10px;}
+    @media print{body{padding:10px;}button{display:none;}}
+  </style>
+  </head><body>
+  <div class="header">
+    <div class="logo">SILEXTECH TONTINE</div>
+    <div class="sub">Mutuelle Villageoise d'Épargne et de Crédit · ${DB.config.anneeDebut}/${DB.config.anneeFin}</div>
+  </div>
+  <h2>${titre}</h2>
+  <table>${corps}</table>
+  <div class="recu-num">Réf. MECV-${data.id||"?"}-${Date.now().toString().slice(-6)} · Émis le ${date} à ${heure}</div>
+  <div class="footer">
+    <div class="sig-block">
+      <div class="sig-label">L'emprunteur / Le membre</div>
+      <div style="height:50px;border-bottom:1px solid #ccc;width:160px;margin-top:4px"></div>
+      <div style="font-size:10px;color:#94a3b8;margin-top:4px">Signature</div>
+    </div>
+    <div class="sig-block">
+      <div class="sig-label">Le Président MECV</div>
+      ${sigImg}
+      <div style="font-size:10px;color:#94a3b8;margin-top:4px">Signature officielle</div>
+    </div>
+  </div>
+  <script>window.onload=()=>window.print();<\/script>
+  </body></html>`;
+
+  const w=window.open("","_blank");
+  if(w){ w.document.write(html); w.document.close(); }
+  else toast("Autorise les popups pour imprimer", false);
+}
+
+function genererPDF(){
+  refreshFin();
+  const totalCot=DB.cotisations.filter(c=>c.statut==="Payé").reduce((s,c)=>s+c.montant,0);
+  const iM=DB.prets.filter(p=>p.statut==="Remboursé"&&p.type==="Membre").reduce((s,p)=>s+p.interets,0);
+  const iE=DB.prets.filter(p=>p.statut==="Remboursé"&&p.type==="Externe").reduce((s,p)=>s+p.interets,0);
+  const totalBenef=iM+iE;
+  const mises=DB.membres.map(m=>({m,mise:DB.cotisations.filter(c=>c.membreId===m.id&&c.statut==="Payé").reduce((s,c)=>s+c.montant,0)}));
+  const totalMises=mises.reduce((s,x)=>s+x.mise,0);
+  const sigImg=DB.signature?`<img src="${DB.signature}" style="height:50px"/>`:
+    '<div style="height:50px;border-bottom:1px solid #ccc;width:180px;margin-top:4px"></div>';
+  const rows=mises.map(({m,mise})=>{
+    const part=totalMises>0?(mise/totalMises*totalBenef):0;
+    return `<tr><td>${m.memId}</td><td>${m.nom}</td><td>${Number(mise).toLocaleString("fr-FR")}</td><td style="color:green">${Number(Math.round(part)).toLocaleString("fr-FR")}</td><td style="font-weight:700">${Number(Math.round(mise+part)).toLocaleString("fr-FR")}</td></tr>`;
+  }).join("");
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <style>body{font-family:Arial;margin:0;padding:20px;color:#0f1923;font-size:12px;}
+  .title{text-align:center;border-bottom:3px solid #36a3ff;padding-bottom:12px;margin-bottom:16px;}
+  h1{color:#36a3ff;font-size:22px;}.sub{font-size:11px;color:#666;}
+  table{width:100%;border-collapse:collapse;margin:10px 0;}
+  th{background:#1a5276;color:white;padding:9px;font-size:11px;}
+  td{padding:8px 10px;border-bottom:1px solid #e5e7eb;}
+  .recap{background:#f0f8ff;padding:12px;border-radius:8px;margin:12px 0;}
+  .recap div{display:flex;justify-content:space-between;padding:4px 0;}
+  @media print{button{display:none;}}
+  </style></head><body>
+  <div class="title"><h1>SILEXTECH TONTINE — RAPPORT DE CLÔTURE</h1>
+  <div class="sub">Cycle ${DB.config.anneeDebut}/${DB.config.anneeFin} · Généré le ${new Date().toLocaleDateString("fr-FR")}</div></div>
+  <div class="recap">
+    <div><span>Total cotisations</span><strong>${Number(totalCot).toLocaleString("fr-FR")} FCFA</strong></div>
+    <div><span>Intérêts membres</span><strong>${Number(iM).toLocaleString("fr-FR")} FCFA</strong></div>
+    <div><span>Intérêts externes</span><strong>${Number(iE).toLocaleString("fr-FR")} FCFA</strong></div>
+    <div><span>Total bénéfices</span><strong style="color:green">${Number(totalBenef).toLocaleString("fr-FR")} FCFA</strong></div>
+  </div>
+  <h3>Distribution par membre</h3>
+  <table><tr><th>ID</th><th>Membre</th><th>Mise (FCFA)</th><th>Bénéfice (FCFA)</th><th>Total à recevoir</th></tr>${rows}</table>
+  <div style="display:flex;justify-content:flex-end;margin-top:30px;border-top:1px solid #ccc;padding-top:16px">
+    <div style="text-align:center">
+      <div style="font-size:11px;color:#666;margin-bottom:4px">Le Président MECV</div>
+      ${sigImg}
+      <div style="font-size:10px;color:#999;margin-top:4px">Signature officielle</div>
+    </div>
+  </div>
+  <script>window.onload=()=>window.print();<\/script>
+  </body></html>`;
+  const w=window.open("","_blank");
+  if(w){ w.document.write(html); w.document.close(); }
+  else toast("Autorise les popups pour imprimer",false);
+}
+
+// ════════════════════════════════════════
+//  AGRICULTURE
+// ════════════════════════════════════════
+function refreshAgri(){
+  if(!DB.agri) DB.agri={pct:10,superficie:2,saison:'Juin - Octobre 2025',arachide_kg:0,arachide_prix:0,soja_kg:0,soja_prix:0};
+  if(!DB.charges) DB.charges=[];
+  const ag=DB.agri;
+  document.getElementById('agri-pct').value=ag.pct||10;
+  document.getElementById('agri-superficie').value=ag.superficie||2;
+  document.getElementById('agri-saison').value=ag.saison||'';
+  document.getElementById('vente-arachide-kg').value=ag.arachide_kg||0;
+  document.getElementById('vente-arachide-prix').value=ag.arachide_prix||0;
+  document.getElementById('vente-soja-kg').value=ag.soja_kg||0;
+  document.getElementById('vente-soja-prix').value=ag.soja_prix||0;
+  afficherCharges(); calcAgri();
+}
+
+function calcAgri(){
+  if(!DB.charges) DB.charges=[];
+  const totalCot=DB.cotisations.filter(c=>c.statut==='Payé').reduce((s,c)=>s+c.montant,0);
+  const pct=parseFloat(document.getElementById('agri-pct').value)||0;
+  const a_kg=parseFloat(document.getElementById('vente-arachide-kg').value)||0;
+  const a_px=parseFloat(document.getElementById('vente-arachide-prix').value)||0;
+  const s_kg=parseFloat(document.getElementById('vente-soja-kg').value)||0;
+  const s_px=parseFloat(document.getElementById('vente-soja-prix').value)||0;
+  const recettes=a_kg*a_px+s_kg*s_px;
+  const charges=DB.charges.reduce((s,c)=>s+c.montant,0);
+  const benefice=recettes-charges;
+  document.getElementById('agri-fonds-calcule').textContent=fcfa(totalCot*pct/100);
+  document.getElementById('agri-recettes').textContent=fcfa(recettes);
+  document.getElementById('agri-charges-total').textContent=fcfa(charges);
+  document.getElementById('agri-benefice').textContent=fcfa(benefice);
+  document.getElementById('agri-benefice').style.color=benefice>=0?'var(--green)':'var(--red)';
+}
+
+function afficherCharges(){
+  if(!DB.charges) DB.charges=[];
+  const el=document.getElementById('charges-list');
+  if(!DB.charges.length){ el.innerHTML='<div class="empty"><div class="empty-icon">📋</div><div>Aucune charge enregistrée</div></div>'; return; }
+  el.innerHTML=DB.charges.map(c=>`
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+      <div style="font-size:13px">${c.label}</div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:13px">${Number(c.montant).toLocaleString('fr-FR')} F</span>
+        <button class="btn btn-ghost btn-sm admin-only" onclick="ouvrirEditCharge(${c.id})">✏️</button>
+        <button class="btn btn-ghost btn-sm admin-only" onclick="supprimerCharge(${c.id})" style="color:var(--red)">✕</button>
+      </div>
+    </div>`).join('');
+}
+
+function ouvrirEditCharge(id){
+  const c=DB.charges.find(x=>x.id===id); if(!c) return;
+  document.getElementById('edit-charge-id').value=id;
+  document.getElementById('edit-charge-label').value=c.label;
+  document.getElementById('edit-charge-montant').value=c.montant;
+  openModal('modal-charge');
+}
+function sauvegarderCharge(){
+  const id=parseInt(document.getElementById('edit-charge-id').value);
+  const c=DB.charges.find(x=>x.id===id); if(!c) return;
+  c.label=document.getElementById('edit-charge-label').value.trim()||c.label;
+  c.montant=parseFloat(document.getElementById('edit-charge-montant').value)||c.montant;
+  save(); closeModal('modal-charge'); afficherCharges(); calcAgri(); toast('Charge modifiée');
+}
+function ajouterCharge(){
+  if(!DB.charges) DB.charges=[];
+  const label=document.getElementById('charge-label').value.trim();
+  const montant=parseFloat(document.getElementById('charge-montant').value)||0;
+  if(!label||montant<=0){ toast('Remplis le libellé et le montant',false); return; }
+  DB.charges.push({id:nextId(DB.charges),label,montant});
+  save(); document.getElementById('charge-label').value=''; document.getElementById('charge-montant').value='';
+  afficherCharges(); calcAgri(); toast('Charge ajoutée');
+}
+function supprimerCharge(id){ DB.charges=DB.charges.filter(c=>c.id!==id); save(); afficherCharges(); calcAgri(); toast('Charge supprimée'); }
+
+function sauvegarderAgri(){
+  if(!DB.agri) DB.agri={};
+  DB.agri.pct=parseFloat(document.getElementById('agri-pct').value)||10;
+  DB.agri.superficie=parseFloat(document.getElementById('agri-superficie').value)||2;
+  DB.agri.saison=document.getElementById('agri-saison').value;
+  DB.agri.arachide_kg=parseFloat(document.getElementById('vente-arachide-kg').value)||0;
+  DB.agri.arachide_prix=parseFloat(document.getElementById('vente-arachide-prix').value)||0;
+  DB.agri.soja_kg=parseFloat(document.getElementById('vente-soja-kg').value)||0;
+  DB.agri.soja_prix=parseFloat(document.getElementById('vente-soja-prix').value)||0;
+  save(); toast('Données agricoles sauvegardées');
+}
+
+// ════════════════════════════════════════
+//  PWA
+// ════════════════════════════════════════
+let deferredPrompt=null;
+
+function initPWA(){
+  // Service Worker
+  if("serviceWorker" in navigator){
+    navigator.serviceWorker.register("#").then(()=>{}).catch(()=>{});
+  }
+
+  // Manifest inline
+  const manifest={
+    name:"MECV SilexTech Tontine",
+    short_name:"MECV v4.2",
+    start_url:"./",
+    display:"standalone",
+    background_color:"#0a0e1a",
+    theme_color:"#0a0e1a",
+    icons:[{src:"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230a0e1a' rx='20'/><text y='70' x='10' font-size='70' fill='%2336a3ff'>S</text></svg>",sizes:"192x192",type:"image/svg+xml"}]
+  };
+  const blob=new Blob([JSON.stringify(manifest)],{type:"application/json"});
+  document.getElementById("pwa-manifest").href=URL.createObjectURL(blob);
+
+  // Install prompt
+  window.addEventListener("beforeinstallprompt",e=>{
+    e.preventDefault(); deferredPrompt=e;
+    document.getElementById("pwa-banner-wrap").innerHTML=`
+      <div class="pwa-banner">
+        <span style="font-size:20px">📲</span>
+        <div class="pwa-banner-text"><strong>Installer l'app</strong><br>Fonctionne hors ligne sur votre téléphone</div>
+        <button class="pwa-banner-btn" onclick="installPWA()">Installer</button>
+      </div>`;
+    document.getElementById("pwa-install-info").innerHTML='<button class="btn btn-blue" onclick="installPWA()">📲 Installer sur ce téléphone</button>';
+  });
+
+  window.addEventListener("appinstalled",()=>{
+    toast("App installée avec succès !");
+    document.getElementById("pwa-banner-wrap").innerHTML="";
+  });
+
+  // Si déjà installée
+  if(window.matchMedia("(display-mode: standalone)").matches){
+    document.getElementById("pwa-install-info").innerHTML='<p style="color:var(--green);font-size:13px">✅ App déjà installée en mode standalone</p>';
+  }
+}
+
+function installPWA(){
+  if(!deferredPrompt){ toast("Utilise 'Ajouter à l'écran d'accueil' dans Chrome",false); return; }
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(r=>{ if(r.outcome==="accepted") toast("Installation lancée !"); deferredPrompt=null; });
+}
+
+// ════════════════════════════════════════
+//  SHAKE ANIMATION
+// ════════════════════════════════════════
+const styleEl=document.createElement("style");
+styleEl.textContent=`@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}`;
+document.head.appendChild(styleEl);
+
+// ════════════════════════════════════════
+//  EXPOSE ALL FUNCTIONS TO GLOBAL SCOPE
+//  (requis car script type="module" est isolé)
+// ════════════════════════════════════════
+Object.defineProperty(window, "DB", { get: () => DB, set: (v) => { DB = v; }, configurable: true });
+// Fonctions utilitaires
+window.fcfa = fcfa; window.fcfaK = fcfaK; window.initials = initials;
+window.nextId = nextId; window.today = today; window.toast = toast;
+window.openModal = openModal; window.closeModal = closeModal;
+// Auth
+window.updateLoginUI = updateLoginUI; window.isAdmin = isAdmin; window.isSpectateur = isSpectateur;
+window.pinPress = pinPress; window.pinDel = pinDel; window.updatePinDots = updatePinDots;
+window.tryLogin = tryLogin; window.deconnexion = deconnexion; window.applyRoleUI = applyRoleUI;
+// Navigation
+window.showPage = showPage; window.updateHeader = updateHeader; window.fillSelects = fillSelects;
+window.refreshCurrentPage = refreshCurrentPage;
+// Tableau de bord
+window.refreshBord = refreshBord;
+// Cotisations
+window.enrCotisation = enrCotisation; window.affCotisations = affCotisations;
+window.supprimerCotisation = supprimerCotisation;
+// Prêts
+window.updatePretUI = updatePretUI; window.calcPretRecap = calcPretRecap;
+window.enrPret = enrPret; window.affPrets = affPrets;
+window.ouvrirEditPret = ouvrirEditPret; window.sauvegarderPret = sauvegarderPret;
+window.supprimerPret = supprimerPret;
+// Remboursements
+window.ouvrirRemb = ouvrirRemb; window.enrRemboursement = enrRemboursement;
+// Finance
+window.refreshFin = refreshFin; window.genererPDF = genererPDF; window.exporterDonnees = exporterDonnees;
+// Membres
+window.affMembres = affMembres; window.ajouterMembre = ajouterMembre;
+window.ouvrirEditMembre = ouvrirEditMembre; window.sauvegarderMembre = sauvegarderMembre;
+window.supprimerMembre = supprimerMembre;
+// Config
+window.saveCfg = saveCfg; window.loadConfig = loadConfig; window.reinitCycle = reinitCycle;
+// Signature
+window.clearSig = clearSig; window.saveSig = saveSig; window.loadSig = loadSig;
+// Demandes paiement mobile
+window.affDemandes = affDemandes; window.validerDemande = validerDemande;
+window.refuserDemande = refuserDemande; window.demanderPaiementMobile = demanderPaiementMobile;
+// Agriculture
+window.refreshAgri = refreshAgri; window.calcAgri = calcAgri;
+window.afficherCharges = afficherCharges; window.ouvrirEditCharge = ouvrirEditCharge;
+window.sauvegarderCharge = sauvegarderCharge; window.ajouterCharge = ajouterCharge;
+window.supprimerCharge = supprimerCharge; window.sauvegarderAgri = sauvegarderAgri;
+// PWA
+window.installPWA = installPWA; window.forceSyncNow = forceSyncNow;
+window.setSyncStatus = setSyncStatus; window.startSync = startSync;
+Object.defineProperty(window, "groupCode", { get: () => groupCode, set: (v) => { groupCode = v; }, configurable: true });
+Object.defineProperty(window, "roleActuel", { get: () => roleActuel, set: (v) => { roleActuel = v; }, configurable: true });
+Object.defineProperty(window, "membreActuelId", { get: () => membreActuelId, set: (v) => { membreActuelId = v; }, configurable: true });
+Object.defineProperty(window, "pinSaisi", { get: () => pinSaisi, set: (v) => { pinSaisi = v; }, configurable: true });
+Object.defineProperty(window, "currentPage", { get: () => currentPage, set: (v) => { currentPage = v; }, configurable: true });
+window.PINS = PINS; window.ROLE_LABELS = ROLE_LABELS;
+
+// ════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════
+try{ groupCode = localStorage.getItem("mecv_lastgroup")||""; }catch(e){}
+// Pre-fill group code input if available
+const gcInput = document.getElementById("login-groupcode");
+if(gcInput && groupCode) gcInput.value = groupCode;
+setSyncStatus("");
+load();
+</script>
+</body>
+</html>
